@@ -1,0 +1,55 @@
+
+// Project: Sprites
+// Author: John Yu 
+// Created: 2018-04-03
+
+// show all errors
+SetErrorMode(2)
+
+// set window properties
+SetWindowTitle( "Sprites" )
+SetWindowSize( 640, 480, 0 )
+SetWindowAllowResize( 1 ) // allow the user to resize the window
+
+// set display properties
+SetVirtualResolution( 640, 480 ) // doesn't have to match the window
+SetOrientationAllowed( 1, 1, 1, 1 ) // allow both portrait and landscape on mobile devices
+SetSyncRate( 30, 0 ) // 30fps instead of 60 to save battery
+SetScissor( 0,0,0,0 ) // use the maximum available screen space, no black borders
+UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
+
+CreateText(1, "Hello World")
+SetTextSize(1, 30)
+setTextColor(1, 219, 208, 77, 255)
+
+CreateText(2, "Welcome")
+SetTextSize(2, 50)
+setTextColor(2, 244, 0, 0, 255)
+welcomex = GetVirtualWidth()/2 - GetTextTotalWidth(2)/2
+welcomey = GetVirtualHeight()/2 - GetTextTotalHeight(2)/2
+SetTextPosition(2, welcomex, welcomey)
+
+do
+	if GetRawKeyState(65) = 1 // "a" key
+		if welcomex >= 0
+			welcomex = welcomex - 5
+		endif
+    endif
+    if GetRawKeyState(68) = 1 // "d" key
+		if welcomex + GetTextTotalWidth(2) <= GetVirtualWidth() 
+			welcomex = welcomex + 5
+		endif
+	endif
+	if GetRawKeyState(87) = 1 // "w" key
+		if welcomey >= 0
+			welcomey = welcomey - 5
+		endif
+	endif
+	if GetRawKeyState(83) = 1 // "s" key
+		if welcomey + GetTextTotalHeight(2) <= GetVirtualHeight() 
+			welcomey = welcomey + 5
+		endif
+	endif
+	setTextPosition(2, welcomex, welcomey)
+	Sync()
+loop
