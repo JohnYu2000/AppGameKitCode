@@ -30,9 +30,42 @@ while playagaincondition = 1
 bluedirx = 1
 bluediry = 1
 score = 0
-timervar = 60 // The actual countdown in game
+timervar = 5 // The actual countdown in game
 timernum = 0
+// **** Opening Sprites and Text **** //
+// Opening Background //
+CreateSprite(6, 1)
+SetSpriteSize(6, GetVirtualWidth(), GetVirtualHeight())
 
+// Play Button //
+CreateText(7, "Play")
+SetTextSize(7, 70)
+SetTextColor(7, 245, 170, 24, 255)
+playx = GetVirtualWidth()/2 - GetTextTotalWidth(7)/2
+playxrightcorner = playx + GetTextTotalWidth(7)
+playy = GetVirtualHeight()/2 - GetTextTotalHeight(7)
+playybottomcorner = playy + GetTextTotalHeight(7)
+SetTextPosition(7, playx, playy)
+
+// Opening Controls and Commands
+do
+	if GetPointerX() >= playx and GetPointerX() <= playxrightcorner and GetPointerY() >= playy and GetPointerY() <= playybottomcorner
+		SetTextSize(7, 80)
+		playx = GetVirtualWidth()/2 - GetTextTotalWidth(7)/2
+		SetTextPosition(7, playx, playy)
+		if GetPointerPressed() = 1
+			DeleteAllSprites()
+			DeleteAllText()
+			exit
+		endif
+	else
+		SetTextSize(7, 70)
+		playx = GetVirtualWidth()/2 - GetTextTotalWidth(7)/2
+		SetTextPosition(7, playx, playy)
+	endif
+	sync()
+loop
+// **** In-Game Sprites and Text **** //
 // Background //
 CreateSprite(99, 1)
 SetSpriteSize(99, GetVirtualWidth(), GetVirtualHeight())
@@ -65,6 +98,7 @@ SetTextSize(2, 40)
 SetTextColor(2, 255, 255, 255, 255)
 SetTextPosition(2, 0, 50)
 
+// Game Controls and Commands //
 do
 	// Red Sprite Controls //
     if GetRawKeyState(65) = 1 // "a" key
@@ -134,7 +168,7 @@ do
 	endif
     Sync()
 loop
-
+// **** End Screen Sprites and Text **** //
 // Game Over Background //
 CreateSprite(4, 1) // Grey Background
 SetSpriteSize(4, GetVirtualWidth(), GetVirtualHeight())
@@ -179,6 +213,7 @@ SetTextPosition(6, leavex, leavey)
 
 SetTextDepth(5, 0) // Play Again Button is last TEXT drawn (on top)
 
+// End Screen Controls and Commands //
 do
 	// game over screen //
 	// When mouse hovers over play again sign
