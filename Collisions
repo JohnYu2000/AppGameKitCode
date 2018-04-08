@@ -1,0 +1,236 @@
+// Project: Collisions 
+// Author: John Yu
+// Created: 2018-04-05
+
+// show all errors
+SetErrorMode(2)
+
+// set window properties
+SetWindowTitle( "Collisions" )
+SetWindowSize( 1024, 768, 0 )
+SetWindowAllowResize( 1 ) // allow the user to resize the window
+
+// set display properties
+SetVirtualResolution( 1024, 768 ) // doesn't have to match the window
+SetOrientationAllowed( 1, 1, 1, 1 ) // allow both portrait and landscape on mobile devices
+SetSyncRate( 30, 0 ) // 30fps instead of 60 to save battery
+SetScissor( 0,0,0,0 ) // use the maximum available screen space, no black borders
+UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
+
+CreateImageColor(1, 100, 100, 100, 255) // grey color
+CreateImageColor(2, 255, 0, 0, 255) // red color
+CreateImageColor(3, 0, 0, 255, 255) // blue color
+CreateImageColor(4, 255, 255 ,255, 255) // white color
+CreateImageColor(5, 0, 0, 0, 255) // black color
+
+playagaincondition = 1
+
+while playagaincondition = 1
+// Variables //
+bluedirx = 1
+bluediry = 1
+score = 0
+timervar = 2 // The actual countdown in game
+timernum = 0
+
+// Background //
+CreateSprite(99, 1)
+SetSpriteSize(99, GetVirtualWidth(), GetVirtualHeight())
+
+// Red Sprite //
+CreateSprite(2, 2)
+SetSpriteSize(2, 50, 50)
+redx = GetVirtualWidth()/2 - GetSpriteWidth(2)/2
+redy = GetVirtualHeight()/2 - GetSpriteHeight(2)/2
+SetSpritePosition(2, redx, redy)
+
+// Blue Sprite //
+CreateSprite(3, 3)
+SetSpriteSize(3, 30, 30)
+bluex = Random(0, GetVirtualWidth() - GetSpriteWidth(3))
+bluey = Random(0, GetVirtualHeight() - GetSpriteHeight(3))
+bluespeedx = Random(20, 40)
+bluespeedy = Random(20, 40)
+SetSpritePosition(3, bluex, bluey)
+
+// Score //
+CreateText(1, "Score: " + str(score))
+SetTextSize(1, 40)
+SetTextColor(1, 255, 255, 255, 255)
+SetTextPosition(1, 0, 0)
+
+// Stopwatch //
+CreateText(2, str(timervar))
+SetTextSize(2, 40)
+SetTextColor(2, 255, 255, 255, 255)
+SetTextPosition(2, 0, 50)
+
+do
+	// Red Sprite Controls //
+    if GetRawKeyState(65) = 1 // "a" key
+		if redx >= 0
+			redx = redx - 5
+		endif
+	endif
+	if GetRawKeyState(68) = 1 // "d" key
+		if redx <= GetVirtualWidth() - GetSpriteWidth(2)
+			redx = redx + 5
+		endif
+	endif
+	if GetRawKeyState(87) = 1 // "w" key
+		if redy >= 0
+			redy = redy - 5
+		endif
+	endif
+	if GetRawKeyState(83) = 1 // "s" key
+		if redy <= GetVirtualHeight() - GetSpriteHeight(2)
+			redy = redy + 5
+		endif
+	endif
+	SetSpritePosition(2, redx, redy)
+	
+	// Blue Sprite //
+	bluex = bluex + bluedirx*bluespeedx
+	bluey = bluey + bluediry*bluespeedy
+	if bluex > GetVirtualWidth() - GetSpriteWidth(3)
+		bluedirx = -1
+	else
+		if bluex < 0
+			bluedirx = 1
+		endif
+	endif
+	if bluey > GetVirtualHeight() - GetSpriteHeight(3)
+		bluediry = -1
+	else
+		if bluey < 0
+			bluediry = 1
+		endif
+	endif
+	SetSpritePosition(3, bluex, bluey)
+	
+	// Collisions //
+	if GetSpriteCollision(2, 3) = 1
+		DeleteSprite(3)
+	endif
+	
+	if GetSpriteExists(3) = 0 // Checks if blue sprite exists
+		gosub bluesprite
+		score = score + 1
+		DeleteText(1) // Score Text
+		gosub scoreboard
+	endif
+	// timer //
+	if timervar > 0
+		timernum = timernum + 1
+	endif
+	if timernum = 30
+		timervar = timervar - 1
+		timernum = 0
+		DeleteText(2) // Stopwatch Text
+		gosub stopwatch
+	endif
+	if timervar = 0
+		exit
+	endif
+    Sync()
+loop
+
+// Game Over Background //
+CreateSprite(4, 1) // Grey Background
+SetSpriteSize(4, GetVirtualWidth(), GetVirtualHeight())
+DeleteText(1) // Scoreboard
+DeleteText(2) // Stopwatch
+
+// Game Over Sign //
+CreateText(4, "Game Over")
+SetTextSize(4, 60)
+SetTextColor(4, 255, 100, 50, 255)
+SetTextPosition(4, GetVirtualWidth()/2 - GetTextTotalWidth(4)/2, GetVirtualHeight()/2 - GetTextTotalHeight(4))
+
+// Stats //
+CreateText(3, "Your Score: " + str(score))
+SetTextSize(3, 40)
+SetTextColor(3, 255, 255, 255, 255)
+SetTextPosition(3, GetVirtualWidth()/2 - GetTextTotalWidth(3)/2, GetVirtualHeight()*5/8 - GetTextTotalHeight(3)/2)
+
+// Play Again Button//
+CreateText(5, "Play Again")
+SetTextSize(5, 50)
+SetTextColor(5, 255, 150, 0, 255)
+playagainx = GetVirtualWidth()/2 - GetTextTotalWidth(5)/2
+playagainy = GetVirtualHeight()/2
+SetTextPosition(5, playagainx, playagainy)
+
+// Play Again Hitbox //
+CreateSprite(5, 4)
+SetSpriteSize(5, GetTextTotalWidth(5), GetTextTotalHeight(5))
+playagainbackgroundx = GetVirtualWidth()/2 - GetTextTotalWidth(5)/2
+playagainbackgroundy = GetVirtualHeight()/2 
+SetSpritePosition(5, playagainbackgroundx, playagainbackgroundy)
+SetSpriteColorAlpha(5, 0)
+
+// Leave Button Border //
+createsprite(6, 5) 
+leaveborderxcentre = GetVirtualWidth()/2
+leaveborderycentre = GetVirtualHeight()*3/4
+SetSpriteShapeCircle(1, leaveborderxcentre, leaveborderycentre, 50)
+//SetSpritePosition(6, leaveborderxcentre, leaveborderycentre)
+//SetSpriteSize(6, 50, 50)
+SetSpriteColor(6, 0, 0, 0, 255)
+
+// "X" , Leave Button //
+CreateText(6, "X")
+SetTextSize(6, 40)
+SetTextColor(6, 177, 16, 20, 255) 
+leavex = GetVirtualWidth()/2 - GetTextTotalWidth(6)/2
+leavey = GetVirtualHeight()*3/4 - GetTextTotalHeight(6)/2
+SetTextPosition(6, leavex, leavey)
+
+SetTextDepth(5, 0) // Play Again Button is last TEXT drawn (on top)
+
+do
+	// game over screen //
+	// When mouse hovers over play again sign a white box will appear
+	if GetPointerX() >= playagainbackgroundx and GetPointerX() <= playagainbackgroundx + GetSpriteWidth(5) and GetPointerY() >= playagainbackgroundy and GetPointerY() <= playagainbackgroundy + GetSpriteHeight(5) 
+		SetTextSize(5, 55)
+		playagainx = GetVirtualWidth()/2 - GetTextTotalWidth(5)/2
+		SetTextPosition(5, playagainx, playagainy)
+		if GetPointerPressed() = 1
+			DeleteAllText()
+			DeleteAllSprites()
+			exit
+		endif
+	else
+		SetTextSize(5, 50)
+		playagainx = GetVirtualWidth()/2 - GetTextTotalWidth(5)/2
+		SetTextPosition(5, playagainx, playagainy)
+	endif
+	Sync()
+loop
+endwhile
+// Blue Sprite Subroutine //
+bluesprite:
+	CreateSprite(3, 3)
+	SetSpriteSize(3, 30, 30)
+	bluex = Random(0, GetVirtualWidth() - GetSpriteWidth(3))
+	bluey = Random(0, GetVirtualHeight() - GetSpriteHeight(3))
+	bluespeedx = Random(20, 40)
+	bluespeedy = Random(20, 40)
+	SetSpritePosition(3, bluex, bluey)
+return
+
+// Score Subroutine //
+scoreboard:
+	CreateText(1, "Score: " + str(score))
+	SetTextSize(1, 40)
+	SetTextColor(1, 255, 255, 255, 255)
+	SetTextPosition(1, 0, 0)
+return
+
+// Stopwatch Display Subroutine //
+stopwatch:
+	CreateText(2, str(timervar))
+	SetTextSize(2, 40)
+	SetTextColor(2, 255, 255, 255, 255)
+	SetTextPosition(2, 0, 50)
+return
