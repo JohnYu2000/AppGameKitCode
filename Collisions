@@ -30,7 +30,7 @@ while playagaincondition = 1
 bluedirx = 1
 bluediry = 1
 score = 0
-timervar = 2 // The actual countdown in game
+timervar = 60 // The actual countdown in game
 timernum = 0
 
 // Background //
@@ -169,18 +169,9 @@ playagainbackgroundy = GetVirtualHeight()/2
 SetSpritePosition(5, playagainbackgroundx, playagainbackgroundy)
 SetSpriteColorAlpha(5, 0)
 
-// Leave Button Border //
-createsprite(6, 5) 
-leaveborderxcentre = GetVirtualWidth()/2
-leaveborderycentre = GetVirtualHeight()*3/4
-SetSpriteShapeCircle(1, leaveborderxcentre, leaveborderycentre, 50)
-//SetSpritePosition(6, leaveborderxcentre, leaveborderycentre)
-//SetSpriteSize(6, 50, 50)
-SetSpriteColor(6, 0, 0, 0, 255)
-
 // "X" , Leave Button //
-CreateText(6, "X")
-SetTextSize(6, 40)
+CreateText(6, "EXIT")
+SetTextSize(6, 50)
 SetTextColor(6, 177, 16, 20, 255) 
 leavex = GetVirtualWidth()/2 - GetTextTotalWidth(6)/2
 leavey = GetVirtualHeight()*3/4 - GetTextTotalHeight(6)/2
@@ -190,9 +181,9 @@ SetTextDepth(5, 0) // Play Again Button is last TEXT drawn (on top)
 
 do
 	// game over screen //
-	// When mouse hovers over play again sign a white box will appear
+	// When mouse hovers over play again sign
 	if GetPointerX() >= playagainbackgroundx and GetPointerX() <= playagainbackgroundx + GetSpriteWidth(5) and GetPointerY() >= playagainbackgroundy and GetPointerY() <= playagainbackgroundy + GetSpriteHeight(5) 
-		SetTextSize(5, 55)
+		SetTextSize(5, 54)
 		playagainx = GetVirtualWidth()/2 - GetTextTotalWidth(5)/2
 		SetTextPosition(5, playagainx, playagainy)
 		if GetPointerPressed() = 1
@@ -204,6 +195,22 @@ do
 		SetTextSize(5, 50)
 		playagainx = GetVirtualWidth()/2 - GetTextTotalWidth(5)/2
 		SetTextPosition(5, playagainx, playagainy)
+	endif
+	
+	// When mouse hovers over EXIT sign
+	if GetPointerX() >= leavex and GetPointerX() <= leavex + GetTextTotalWidth(6) and GetPointerY() >= leavey and GetPointerY() <= leavey + GetTextTotalHeight(6)
+		SetTextSize(6, 55)
+		leavex = GetVirtualWidth()/2 - GetTextTotalWidth(6)/2
+		leavey = GetVirtualHeight()*3/4 - GetTextTotalHeight(6)/2
+		SetTextPosition(6, leavex, leavey)
+		if GetPointerPressed() = 1
+			end
+		endif
+	else
+		SetTextSize(6, 50)
+		leavex = GetVirtualWidth()/2 - GetTextTotalWidth(6)/2
+		leavey = GetVirtualHeight()*3/4 - GetTextTotalHeight(6)/2
+		SetTextPosition(6, leavex, leavey)
 	endif
 	Sync()
 loop
