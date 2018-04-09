@@ -1,0 +1,115 @@
+// Project: Egg Hunt 
+// Name: John
+// Created: 2018-04-09
+
+// show all errors
+SetErrorMode(2)
+
+// set window properties
+SetWindowTitle( "Egg Hunt" )
+SetWindowSize( 640, 480, 0 )
+SetWindowAllowResize( 1 ) // allow the user to resize the window
+
+// set display properties
+SetVirtualResolution( 640, 480 ) // doesn't have to match the window
+SetOrientationAllowed( 1, 1, 1, 1 ) // allow both portrait and landscape on mobile devices
+SetSyncRate( 30, 0 ) // 30fps instead of 60 to save battery
+SetScissor( 0,0,0,0 ) // use the maximum available screen space, no black borders
+UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
+
+// **** Variables **** //
+score = 0
+
+// **** Images **** //
+LoadImage(1, "bunny.png")
+LoadImage(2, "egg1.png")
+LoadImage(3, "egg2.png")
+LoadImage(4, "grass.png")
+
+// **** Sprites **** //
+// Grass //
+
+// Bunny //
+CreateSprite(1, 1) // Bunny
+SetSpriteScale(1, 0.25, 0.25)
+bunnyx = GetVirtualWidth()/2 - GetSpriteWidth(1)/2
+bunnyy = GetVirtualHeight()/2 - GetSpriteHeight(1)/2
+SetSpritePosition(1, bunnyx, bunnyy)
+
+// Egg1 //
+CreateSprite(2, 2) // Egg1
+SetSpriteScale(2, 0.25, 0.25)
+egg1x = Random(0, GetVirtualWidth() - GetSpriteWidth(2))
+egg1y = Random(0, GetVirtualHeight() - GetSpriteHeight(2))
+SetSpritePosition(2, egg1x, egg1y)
+
+// Egg2 //
+CreateSprite(3, 3) // Egg2
+SetSpriteScale(3, 0.25, 0.25)
+egg2x = Random(0, GetVirtualWidth() - GetSpriteWidth(2))
+egg2y = Random(0, GetVirtualHeight() - GetSpriteHeight(2))
+SetSpritePosition(3, egg2x, egg2y)
+
+// **** Texts **** //
+CreateText(1, "Score: " + str(score)) // Displays the score
+SetTextColor(1, 255, 255, 255, 255)
+SetTextPosition(1, 0, 0)
+SetTextSize(1, 25)
+
+do
+    // **** Bunny Key Controls **** //
+    if GetRawKeyState(65) = 1 // "a" key
+		if bunnyx > 0
+			bunnyx = bunnyx - 5
+		endif
+	endif
+	if GetRawKeyState(68) = 1 // "d" key
+		if bunnyx < GetVirtualWidth() - GetSpriteWidth(1)
+			bunnyx = bunnyx + 5
+		endif
+	endif
+	if GetRawKeyState(87) = 1 // "w" key		
+		if bunnyy > 0
+			bunnyy = bunnyy - 5
+		endif
+	endif
+	if GetRawKeyState(83) = 1 // "s" key		
+		if bunnyy< GetVirtualHeight() - GetSpriteHeight(1)
+		bunnyy = bunnyy + 5
+		endif
+	endif
+	SetSpritePosition(1, bunnyx, bunnyy)
+	
+	// **** Sprite Collisions **** //
+	// Bunny and Egg1 Collide //
+	if GetSpriteCollision(1, 2) = 1
+		while GetSpriteCollision(1, 2) = 1
+			egg1x = Random(0, GetVirtualWidth() - GetSpriteWidth(2))
+			egg1y = Random(0, GetVirtualHeight() - GetSpriteHeight(2))
+			SetSpritePosition(2, egg1x, egg1y)
+		endwhile
+		score = score + 1
+		DeleteText(1)
+		CreateText(1, "Score: " + str(score)) // Displays the score
+		SetTextColor(1, 255, 255, 255, 255)
+		SetTextPosition(1, 0, 0)
+		SetTextSize(1, 25)
+	endif
+	
+	// Bunny and Egg2 Collide //
+	if GetSpriteCollision(1, 3) = 1
+		while GetSpriteCollision(1, 3) = 1
+			egg2x = Random(0, GetVirtualWidth() - GetSpriteWidth(2))
+			egg2y = Random(0, GetVirtualHeight() - GetSpriteHeight(2))
+			SetSpritePosition(3, egg2x, egg2y)
+		endwhile
+		score = score + 1
+		DeleteText(1)
+		CreateText(1, "Score: " + str(score)) // Displays the score
+		SetTextColor(1, 255, 255, 255, 255)
+		SetTextPosition(1, 0, 0)
+		SetTextSize(1, 25)
+	endif
+
+    Sync()
+loop
