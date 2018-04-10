@@ -27,13 +27,14 @@ UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
 		//	51+ eggs: Hacker Picture, quote: Hey, quit hacking
 // 2. Add some pictures for start screen //
 // 3. Fix the misclicks
+// 4. Add feature where the longer an egg is not picked up the less points it will be worth
 
 // **** Everything **** //
 do
 
 // **** Variables **** //
 score = 0
-time = 5 // This is the in-game time
+time = 30 // This is the in-game time
 second = 0 // Just to keep track of one second
 speed = 0
 	
