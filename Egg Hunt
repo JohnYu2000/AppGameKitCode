@@ -18,23 +18,34 @@ SetScissor( 0,0,0,0 ) // use the maximum available screen space, no black border
 UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
 
 //// ******** To-Do List ******** ////
-// 1. Add Funny Pictures at the end based on performance (Not Recommended)//
-		//	0 eggs: Spongebob crying, quote: Your first step to success is trying
-		//	1 - 10 eggs:  Spongebob failing driver test, quote: At least you tried
-		//	11 - 20 eggs: Clapping Emoji, qoute: Great Job
-		//	21 - 40 eggs: sunglasses emoji, quote: DANG
-		//	41 - 50 eggs: Neo Picture, quote: You are the One
-		//	51+ eggs: Hacker Picture, quote: Hey, quit hacking
-// 2. Add some pictures for start screen //
-// 3. Fix the misclicks
-// 4. Add feature where the longer an egg is not picked up the less points it will be worth
+
+// 1. Add some pictures for start screen //
+// 2. Add feature where the longer an egg is not picked up the less points it will be worth
+// 3. Clean up code
+// 4. Change Timer System
+// 5. Add Tutorial
+
+/* Notes:
+Subroutines are a programming tool that separates 
+the program into individual algorithms so that 
+they can be added or removed from the program
+with relative ease. (aside, multiple programmers 
+can work on the same program by assigning different 
+subroutines to each programmer). Subroutines are 
+also a precursor to Functions (CS20) where functions
+take a variable and modify it.
+
+In python, subroutines appear at the top: however,
+in BASIC, they are written at the bottom.
+*/
+
 
 // **** Everything **** //
 do
 
 // **** Variables **** //
 score = 0
-time = 30 // This is the in-game time
+time = 10 // This is the in-game time
 second = 0 // Just to keep track of one second
 speed = 0
 	
@@ -45,6 +56,7 @@ LoadImage(3, "egg2.png")
 CreateImageColor(4, 52, 180, 54, 255) // Light-Green Color
 CreateImageColor(5, 255, 255, 255, 255) // White Color
 CreateImageColor(6, 124, 252, 0, 255) // Grass-Green Color
+CreateImageColor(7, 150, 150, 150, 255) // Grey Color
 
 // **** Start Menu **** //
 
@@ -53,30 +65,30 @@ CreateSprite(6, 4) // Background
 SetSpriteSize(6, GetVirtualWidth(), GetVirtualHeight())
 
 // Play Button //
-CreateText(5, "Play")
-SetTextSize(5, 50)
-SetTextColor(5, 255, 0, 0, 255)
-playx = GetVirtualWidth()/2 - GetTextTotalWidth(5)/2
-playy = GetVirtualHeight()/2 - GetTextTotalHeight(5)/2
-SetTextPosition(5, playx, playy)
+play = CreateText("Play")
+SetTextSize(play, 50)
+SetTextColor(play, 255, 0, 0, 255)
+playx = GetVirtualWidth()/2 - GetTextTotalWidth(play)/2
+playy = GetVirtualHeight()/2 - GetTextTotalHeight(play)/2
+SetTextPosition(play, playx, playy)
 
 // Start Menu Commands //
 do
-	if GetPointerX() >= playx and GetPointerX() <= playx + GetTextTotalWidth(5) and GetPointerY() >= playy and GetPointerY() <= playy + GetTextTotalHeight(5)
-		SetTextSize(5, 55)
-		playx = GetVirtualWidth()/2 - GetTextTotalWidth(5)/2
-		playy = GetVirtualHeight()/2 - GetTextTotalHeight(5)/2
-		SetTextPosition(5, playx, playy)
+	if GetTextHitTest(play, GetPointerX(), GetPointerY())
+		SetTextSize(play, 55)
+		playx = GetVirtualWidth()/2 - GetTextTotalWidth(play)/2
+		playy = GetVirtualHeight()/2 - GetTextTotalHeight(play)/2
+		SetTextPosition(play, playx, playy)
 		if GetPointerReleased() = 1
 			DeleteAllText()
 			DeleteAllSprites()
 			exit
 		endif
 	else
-		SetTextSize(5, 50)
-		playx = GetVirtualWidth()/2 - GetTextTotalWidth(5)/2
-		playy = GetVirtualHeight()/2 - GetTextTotalHeight(5)/2
-		SetTextPosition(5, playx, playy)
+		SetTextSize(play, 50)
+		playx = GetVirtualWidth()/2 - GetTextTotalWidth(play)/2
+		playy = GetVirtualHeight()/2 - GetTextTotalHeight(play)/2
+		SetTextPosition(play, playx, playy)
 	endif
 	sync()
 loop
@@ -122,7 +134,7 @@ SetTextPosition(11, insanex, insaney)
 // Difficulty Commands //
 do
 	// Easy Commands //
-	if GetPointerX() >= easyx and GetPointerX() <= easyx + GetTextTotalWidth(8) and GetPointerY() >= easyy and GetPointerY() <= easyy + GetTextTotalHeight(8)
+	if GetTextHitTest(8, GetPointerX(), GetPointerY())
 		SetTextSize(8, 55)
 		easyx = GetVirtualWidth()/2 - GetTextTotalWidth(8)/2
 		easyy = GetVirtualHeight()/2 - GetTextTotalHeight(8)*2
@@ -140,7 +152,7 @@ do
 	endif
 	
 	// Intermediate Commands //
-	if GetPointerX() >= mediumx and GetPointerX() <= mediumx + GetTextTotalWidth(9) and GetPointerY() >= mediumy and GetPointerY() <= mediumy + GetTextTotalHeight(9)
+	if GetTextHitTest(9, GetPointerX(), GetPointerY())
 		SetTextSize(9, 55)
 		mediumx = GetVirtualWidth()/2 - GetTextTotalWidth(9)/2
 		mediumy = GetVirtualHeight()/2 - GetTextTotalHeight(9)
@@ -158,7 +170,7 @@ do
 	endif
 	
 	// Hard Commands //
-	if GetPointerX() >= hardx and GetPointerX() <= hardx + GetTextTotalWidth(10) and GetPointerY() >= hardy and GetPointerY() <= hardy + GetTextTotalHeight(10)
+	if GetTextHitTest(10, GetPointerX(), GetPointerY())
 		SetTextSize(10, 55)
 		hardx = GetVirtualWidth()/2 - GetTextTotalWidth(10)/2
 		hardy = GetVirtualHeight()/2 
@@ -176,7 +188,7 @@ do
 	endif
 	
 	// Insane Commands //
-	if GetPointerX() >= insanex and GetPointerX() <= insanex + GetTextTotalWidth(11) and GetPointerY() >= insaney and GetPointerY() <= insaney + GetTextTotalHeight(11)
+	if GetTextHitTest(11, GetPointerX(), GetPointerY())
 		SetTextSize(11, 55)
 		insanex = GetVirtualWidth()/2 - GetTextTotalWidth(11)/2
 		insaney = GetVirtualHeight()/2 + GetTextTotalHeight(11)
@@ -222,6 +234,21 @@ egg2x = Random(0, GetVirtualWidth() - GetSpriteWidth(2))
 egg2y = Random(0, GetVirtualHeight() - GetSpriteHeight(2))
 SetSpritePosition(3, egg2x, egg2y)
 
+// Rocks //
+for x = 8 to 18
+	CreateSprite(x, 7)
+	SetSpriteColor(x, 150, 150, 150, 255)
+	SetSpriteScale(x, 10, 10)
+	rockx = Random(0, GetVirtualWidth() - GetSpriteWidth(x))
+	rocky = Random(0, GetVirtualHeight() - GetSpriteHeight(x))
+	SetSpritePosition(x, rockx, rocky)
+	while GetSpriteCollision(x, 1) or GetSpriteCollision(x, 2) or GetSpriteCollision(x, 3)
+		rockx = Random(0, GetVirtualWidth() - GetSpriteWidth(x))
+		rocky = Random(0, GetVirtualHeight() - GetSpriteHeight(x))
+		SetSpritePosition(x, rockx, rocky)
+	endwhile
+next 
+
 // **** Texts **** //
 
 // Score Text //
@@ -247,7 +274,7 @@ SetTextPosition(7, quitx, quity)
 // **** In-Game **** //
 do
 	// **** Quit Commands **** //
-	if GetPointerX() >= quitx and GetPointerX() <= quitx + GetTextTotalWidth(7) and GetPointerY() >= quity and GetPointerY() <= quity + GetTextTotalHeight(7)
+	if GetTextHitTest(7, GetPointerX(), GetPointerY())
 		if GetPointerReleased() = 1
 			end
 		endif
@@ -257,11 +284,7 @@ do
 	if second = 30 // FPS of game
 		second = 0
 		time = time - 1
-		DeleteText(2)
-		CreateText(2, "Time: " + str(time))
-		SetTextColor(2, 255, 255, 255, 255)
-		SetTextPosition(2, 0, GetTextTotalHeight(1))
-		SetTextSize(2, 25)
+		SetTextString(2, "Time: " + str(time))
 		if time <= 0
 			exit
 		endif
@@ -296,33 +319,34 @@ do
 	
 	// Bunny and Egg1 Collide //
 	if GetSpriteCollision(1, 2) = 1
-		while GetSpriteCollision(1, 2) = 1
+		while GetSpriteCollision(1, 2) = 1 or GetSpriteCollision(2, 3)
 			egg1x = Random(0, GetVirtualWidth() - GetSpriteWidth(2))
 			egg1y = Random(0, GetVirtualHeight() - GetSpriteHeight(2))
 			SetSpritePosition(2, egg1x, egg1y)
 		endwhile
 		score = score + 1
-		DeleteText(1)
-		CreateText(1, "Score: " + str(score)) // Displays the score
-		SetTextColor(1, 255, 255, 255, 255)
-		SetTextPosition(1, 0, 0)
-		SetTextSize(1, 25)
+		SetTextString(1, "Score: " + str(score))
 	endif
 	
 	// Bunny and Egg2 Collide //
 	if GetSpriteCollision(1, 3) = 1
-		while GetSpriteCollision(1, 3) = 1
+		while GetSpriteCollision(1, 3) = 1 or GetSpriteCollision(3, 2)
 			egg2x = Random(0, GetVirtualWidth() - GetSpriteWidth(2))
 			egg2y = Random(0, GetVirtualHeight() - GetSpriteHeight(2))
 			SetSpritePosition(3, egg2x, egg2y)
 		endwhile
 		score = score + 1
-		DeleteText(1)
-		CreateText(1, "Score: " + str(score)) // Displays the score
-		SetTextColor(1, 255, 255, 255, 255)
-		SetTextPosition(1, 0, 0)
-		SetTextSize(1, 25)
+		SetTextString(1, "Score: " + str(score))
 	endif
+	
+	// Bunny and Rock Collide
+	for x = 8 to 18
+		if GetSpriteExists(x) = 1
+			if GetSpriteCollision(1, x)
+				DeleteSprite(x)
+			endif
+		endif
+	next
 
     Sync()
 loop
@@ -362,12 +386,13 @@ SetTextPosition(6, finalscorex, finalscorey)
 // **** End Screen **** //
 do 
 	// Main Menu Commands //
-	if GetPointerX() >= mainmenux and GetPointerX() <= mainmenux + GetTextTotalWidth(3) and GetPointerY() >= mainmenuy and GetPointerY() <= mainmenuy + GetTextTotalHeight(3)
+	if GetTextHitTest(3, GetPointerX(), GetPointerY())
 		SetTextSize(3, 55)
 		mainmenux = GetVirtualWidth()/2 - GetTextTotalWidth(3)/2
 		mainmenuy = GetVirtualHeight()/2
 		SetTextPosition(3, mainmenux, mainmenuy)
 		if GetPointerReleased() = 1
+			sync()
 			DeleteAllText()
 			DeleteAllSprites()
 			DeleteAllImages()
@@ -381,7 +406,7 @@ do
 	endif
 	
 	// Exit Button Commands //
-	if GetPointerX() >= exitx and GetPointerX() <= exitx + GetTextTotalWidth(4) and GetPointerY() >= exity and GetPointerY() <= exity + GetTextTotalHeight(4)
+	if GetTextHitTest(4, GetPointerX(), GetPointerY())
 		SetTextSize(4, 55)
 		exitx = GetVirtualWidth()/2 - GetTextTotalWidth(4)/2
 		exity = GetVirtualHeight()*2/3 - GetTextTotalHeight(4)/2
