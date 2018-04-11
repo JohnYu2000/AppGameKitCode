@@ -19,11 +19,7 @@ UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
 
 //// ******** To-Do List ******** ////
 
-// 1. Add some pictures for start screen //
-// 2. Add feature where the longer an egg is not picked up the less points it will be worth
-// 3. Clean up code
-// 4. Change Timer System
-// 5. Add Tutorial
+// 1. Add title for start screen //
 
 /* Notes:
 Subroutines are a programming tool that separates 
@@ -39,8 +35,8 @@ In python, subroutines appear at the top: however,
 in BASIC, they are written at the bottom.
 */
 
+// **** Code Starts Here **** //
 
-// **** Everything **** //
 do
 
 // **** Variables **** //
@@ -48,6 +44,12 @@ score = 0
 time = 10 // This is the in-game time
 second = 0 // Just to keep track of one second
 speed = 0
+egg1value = 10
+egg2value = 10
+timevalue1 = 0 // Keeps track of how long egg1 has existed
+timevalue2 = 0 // Keeps track of how long egg2 has existed
+devalue1 = 0 // First Instance that eggs devalue
+devalue2 = 0 // Second Instance that eggs devalue
 	
 // **** Images **** //
 LoadImage(1, "bunny.png")
@@ -69,11 +71,28 @@ play = CreateText("Play")
 SetTextSize(play, 50)
 SetTextColor(play, 255, 0, 0, 255)
 playx = GetVirtualWidth()/2 - GetTextTotalWidth(play)/2
-playy = GetVirtualHeight()/2 - GetTextTotalHeight(play)/2
+playy = GetVirtualHeight()/2 - GetTextTotalHeight(play)
 SetTextPosition(play, playx, playy)
+
+// Tutorial Button //
+tutorial = CreateText("Tutorial")
+SetTextSize(tutorial, 50)
+SetTextColor(tutorial, 0, 0, 0, 255)
+tutorialx = GetVirtualWidth()/2 - GetTextTotalWidth(tutorial)/2
+tutorialy = GetVirtualHeight()/2 + GetTextTotalHeight(tutorial)/2
+SetTextPosition(tutorial, tutorialx, tutorialy)
+
+// X Button //
+CreateText(16, "X")
+SetTextSize(16, 30)
+SetTextColor(16, 255, 0, 0, 255)
+quitx = GetVirtualWidth() - GetTextTotalWidth(16) - 10
+quity = 0
+SetTextPosition(16, quitx, quity)
 
 // Start Menu Commands //
 do
+	// Play Button Commands //
 	if GetTextHitTest(play, GetPointerX(), GetPointerY())
 		SetTextSize(play, 55)
 		playx = GetVirtualWidth()/2 - GetTextTotalWidth(play)/2
@@ -89,6 +108,56 @@ do
 		playx = GetVirtualWidth()/2 - GetTextTotalWidth(play)/2
 		playy = GetVirtualHeight()/2 - GetTextTotalHeight(play)/2
 		SetTextPosition(play, playx, playy)
+	endif
+	
+	// Tutorial Button Commands //
+	if GetTextHitTest(tutorial, GetPointerX(), GetPointerY())
+		SetTextSize(tutorial, 55)
+		tutorialx = GetVirtualWidth()/2 - GetTextTotalWidth(tutorial)/2
+		tutorialy = GetVirtualHeight()/2 + GetTextTotalHeight(tutorial)/2
+		SetTextPosition(tutorial, tutorialx, tutorialy)
+		if GetPointerPressed() = 1
+			SetTextSize(tutorial, 50)
+			tutorialx = GetVirtualWidth()/2 - GetTextTotalWidth(tutorial)/2
+			tutorialy = GetVirtualHeight()/2 + GetTextTotalHeight(tutorial)/2
+			SetTextPosition(tutorial, tutorialx, tutorialy)
+			gosub tutorial
+			do
+				// Back Button Commands //
+				if GetTextHitTest(back, GetPointerX(), GetPointerY())
+					SetTextSize(back, 55)
+					backx = GetVirtualWidth()/2 - GetTextTotalWidth(back)/2
+					backy = GetVirtualHeight() - GetTextTotalHeight(back)
+					SetTextPosition(back, backx, backy)
+					if GetPointerPressed() = 1
+						for x = 12 to 15
+							DeleteText(x)
+						next							
+						DeleteSprite(8)
+						DeleteText(back)
+						exit
+					endif
+				else
+					SetTextSize(back, 50)
+					backx = GetVirtualWidth()/2 - GetTextTotalWidth(back)/2
+					backy = GetVirtualHeight() - GetTextTotalHeight(back)
+					SetTextPosition(back, backx, backy)
+				endif
+				sync()
+			loop
+		endif
+	else
+		SetTextSize(tutorial, 50)
+		tutorialx = GetVirtualWidth()/2 - GetTextTotalWidth(tutorial)/2
+		tutorialy = GetVirtualHeight()/2 + GetTextTotalHeight(tutorial)/2
+		SetTextPosition(tutorial, tutorialx, tutorialy)
+	endif
+	
+	// Exit Button Commands //
+	if GetTextHitTest(16, GetPointerX(), GetPointerY())
+		if GetPointerReleased() = 1
+			end
+		endif
 	endif
 	sync()
 loop
@@ -131,6 +200,14 @@ insanex = GetVirtualWidth()/2 - GetTextTotalWidth(11)/2
 insaney = GetVirtualHeight()/2 + GetTextTotalHeight(11)
 SetTextPosition(11, insanex, insaney)
 
+// X Button //
+CreateText(17, "X")
+SetTextSize(17, 30)
+SetTextColor(17, 255, 0, 0, 255)
+quitx = GetVirtualWidth() - GetTextTotalWidth(17) - 10
+quity = 0
+SetTextPosition(17, quitx, quity)
+
 // Difficulty Commands //
 do
 	// Easy Commands //
@@ -140,7 +217,10 @@ do
 		easyy = GetVirtualHeight()/2 - GetTextTotalHeight(8)*2
 		SetTextPosition(8, easyx, easyy)
 		if GetPointerPressed() = 1
-			speed = 20
+			sync()
+			speed = 30
+			devalue1 = 5
+			devalue2 = 10
 			DeleteAllText()
 			exit
 		endif
@@ -158,7 +238,10 @@ do
 		mediumy = GetVirtualHeight()/2 - GetTextTotalHeight(9)
 		SetTextPosition(9, mediumx, mediumy)
 		if GetPointerPressed() = 1
-			speed = 10
+			sync()
+			speed = 30
+			devalue1 = 1.2
+			devalue2 = 2.5
 			DeleteAllText()
 			exit
 		endif
@@ -176,7 +259,10 @@ do
 		hardy = GetVirtualHeight()/2 
 		SetTextPosition(10, hardx, hardy)
 		if GetPointerPressed() = 1
-			speed = 5
+			sync()
+			speed = 40
+			devalue1 = 0.8
+			devalue2 = 1.4
 			DeleteAllText()
 			exit
 		endif
@@ -194,7 +280,10 @@ do
 		insaney = GetVirtualHeight()/2 + GetTextTotalHeight(11)
 		SetTextPosition(11, insanex, insaney)
 		if GetPointerPressed() = 1
-			speed = 1
+			sync()
+			speed = 50
+			devalue1 = 0.5
+			devalue2 = 0.75
 			DeleteAllText()
 			exit
 		endif
@@ -204,6 +293,146 @@ do
 		insaney = GetVirtualHeight()/2 + GetTextTotalHeight(11)
 		SetTextPosition(11, insanex, insaney)
 	endif
+	
+	// Exit Button Commands //
+	if GetTextHitTest(17, GetPointerX(), GetPointerY())
+		if GetPointerReleased() = 1
+			end
+		endif
+	endif
+	sync()
+loop
+
+// **** Time Chooser **** //
+
+// Background
+CreateSprite(9, 4) 
+SetSpriteSize(9, GetVirtualWidth(), GetVirtualHeight())
+
+// 15 second option //
+option15sec = CreateText("15 Seconds")
+SetTextSize(option15sec, 50)
+SetTextColor(option15sec, 255, 128, 0, 255)
+option15secx = GetVirtualWidth()/2 - GetTextTotalWidth(option15sec)/2
+option15secy = GetVirtualHeight()/2 - GetTextTotalHeight(option15sec)*2 
+SetTextPosition(option15sec, option15secx, option15secy)
+
+// 30 second option //
+option30sec = CreateText("30 Seconds")
+SetTextSize(option30sec, 50)
+SetTextColor(option30sec, 255, 128, 0, 255)
+option30secx = GetVirtualWidth()/2 - GetTextTotalWidth(option30sec)/2
+option30secy = GetVirtualHeight()/2 - GetTextTotalHeight(option30sec)
+SetTextPosition(option30sec, option30secx, option30secy)
+
+// 45 second option //
+option45sec = CreateText("45 Seconds")
+SetTextSize(option45sec, 50)
+SetTextColor(option45sec, 255, 128, 0, 255)
+option45secx = GetVirtualWidth()/2 - GetTextTotalWidth(option45sec)/2
+option45secy = GetVirtualHeight()/2
+SetTextPosition(option45sec, option45secx, option45secy)
+
+// 60 second option
+option60sec = CreateText("60 Seconds")
+SetTextSize(option60sec, 50)
+SetTextColor(option60sec, 255, 128, 0, 255)
+option60secx = GetVirtualWidth()/2 - GetTextTotalWidth(option60sec)/2
+option60secy = GetVirtualHeight()/2 + GetTextTotalHeight(option60sec)
+SetTextPosition(option60sec, option60secx, option60secy)
+
+// X Button //
+CreateText(18, "X")
+SetTextSize(18, 30)
+SetTextColor(18, 255, 0, 0, 255)
+quitx = GetVirtualWidth() - GetTextTotalWidth(18) - 10
+quity = 0
+SetTextPosition(18, quitx, quity)
+
+// **** Time Selection Commands **** //
+do
+	// 15 second option //
+	if GetTextHitTest(option15sec, GetPointerX(), GetPointerY()) = 1
+		SetTextSize(option15sec, 55)
+		option15secx = GetVirtualWidth()/2 - GetTextTotalWidth(option15sec)/2
+		option15secy = GetVirtualHeight()/2 - GetTextTotalHeight(option15sec)*2 
+		SetTextPosition(option15sec, option15secx, option15secy)
+		if GetPointerPressed() = 1
+			DeleteAllText()
+			DeleteAllSprites()
+			time = 15
+			exit
+		endif
+	else
+		SetTextSize(option15sec, 50)
+		option15secx = GetVirtualWidth()/2 - GetTextTotalWidth(option15sec)/2
+		option15secy = GetVirtualHeight()/2 - GetTextTotalHeight(option15sec)*2 
+		SetTextPosition(option15sec, option15secx, option15secy)
+	endif
+	
+	// 30 second option //
+	if GetTextHitTest(option30sec, GetPointerX(), GetPointerY()) = 1
+		SetTextSize(option30sec, 55)
+		option30secx = GetVirtualWidth()/2 - GetTextTotalWidth(option30sec)/2
+		option30secy = GetVirtualHeight()/2 - GetTextTotalHeight(option30sec)
+		SetTextPosition(option30sec, option30secx, option30secy)
+		if GetPointerPressed() = 1
+			DeleteAllText()
+			DeleteAllSprites()
+			time = 30
+			exit
+		endif
+	else
+		SetTextSize(option30sec, 50)
+		option30secx = GetVirtualWidth()/2 - GetTextTotalWidth(option30sec)/2
+		option30secy = GetVirtualHeight()/2 - GetTextTotalHeight(option30sec)
+		SetTextPosition(option30sec, option30secx, option30secy)
+	endif
+	
+	// 45 second option //
+	if GetTextHitTest(option45sec, GetPointerX(), GetPointerY()) = 1
+		SetTextSize(option45sec, 55)
+		option45secx = GetVirtualWidth()/2 - GetTextTotalWidth(option45sec)/2
+		option45secy = GetVirtualHeight()/2
+		SetTextPosition(option45sec, option45secx, option45secy)
+		if GetPointerPressed() = 1
+			DeleteAllText()
+			DeleteAllSprites()
+			time = 45
+			exit
+		endif
+	else
+		SetTextSize(option45sec, 50)
+		option45secx = GetVirtualWidth()/2 - GetTextTotalWidth(option45sec)/2
+		option45secy = GetVirtualHeight()/2
+		SetTextPosition(option45sec, option45secx, option45secy)
+	endif
+	
+	// 60 second option //
+	if GetTextHitTest(option60sec, GetPointerX(), GetPointerY()) = 1
+		SetTextSize(option60sec, 55)
+		option60secx = GetVirtualWidth()/2 - GetTextTotalWidth(option60sec)/2
+		option60secy = GetVirtualHeight()/2 + GetTextTotalHeight(option60sec)
+		SetTextPosition(option60sec, option60secx, option60secy)
+		if GetPointerPressed() = 1
+			DeleteAllText()
+			DeleteAllSprites()
+			time = 60
+			exit
+		endif
+	else
+		SetTextSize(option60sec, 50)
+		option60secx = GetVirtualWidth()/2 - GetTextTotalWidth(option60sec)/2
+		option60secy = GetVirtualHeight()/2 + GetTextTotalHeight(option60sec)
+		SetTextPosition(option60sec, option60secx, option60secy)
+	endif
+	
+		// Exit Button Commands //
+	if GetTextHitTest(18, GetPointerX(), GetPointerY())
+		if GetPointerReleased() = 1
+			end
+		endif
+	endif	
 	sync()
 loop
 
@@ -234,21 +463,6 @@ egg2x = Random(0, GetVirtualWidth() - GetSpriteWidth(2))
 egg2y = Random(0, GetVirtualHeight() - GetSpriteHeight(2))
 SetSpritePosition(3, egg2x, egg2y)
 
-// Rocks //
-for x = 8 to 18
-	CreateSprite(x, 7)
-	SetSpriteColor(x, 150, 150, 150, 255)
-	SetSpriteScale(x, 10, 10)
-	rockx = Random(0, GetVirtualWidth() - GetSpriteWidth(x))
-	rocky = Random(0, GetVirtualHeight() - GetSpriteHeight(x))
-	SetSpritePosition(x, rockx, rocky)
-	while GetSpriteCollision(x, 1) or GetSpriteCollision(x, 2) or GetSpriteCollision(x, 3)
-		rockx = Random(0, GetVirtualWidth() - GetSpriteWidth(x))
-		rocky = Random(0, GetVirtualHeight() - GetSpriteHeight(x))
-		SetSpritePosition(x, rockx, rocky)
-	endwhile
-next 
-
 // **** Texts **** //
 
 // Score Text //
@@ -271,7 +485,7 @@ quitx = GetVirtualWidth() - GetTextTotalWidth(7) - 10
 quity = 0
 SetTextPosition(7, quitx, quity)
 
-// **** In-Game **** //
+// **** In-Game Commands **** //
 do
 	// **** Quit Commands **** //
 	if GetTextHitTest(7, GetPointerX(), GetPointerY())
@@ -289,7 +503,7 @@ do
 			exit
 		endif
 	endif
-	
+		
     // **** Bunny Key Controls **** //
     if GetRawKeyState(65) = 1 // "a" key
 		SetSpriteFlip(1, 1, 0)
@@ -315,6 +529,35 @@ do
 	endif
 	SetSpritePosition(1, bunnyx, bunnyy)
 	
+	// **** Egg Value **** //
+	
+	timevalue1 = timevalue1 + 1 // Time that egg1 has existed
+	timevalue2 = timevalue2 + 1 // Time that egg2 has existed
+	
+	// Egg1 //
+	if timevalue1 < devalue1*30 
+		egg1value = 10
+	else
+		if timevalue1 > devalue2*30
+			egg1value = 0
+		else
+			egg1value = 5
+		endif
+	endif
+
+	
+	// Egg2 //
+	if timevalue2 < devalue1*30
+		egg2value = 10
+	else
+		if timevalue2 > devalue2*30
+			egg2value = 0
+		else
+			egg2value = 5
+		endif
+	endif
+
+	
 	// **** Sprite Collisions **** //
 	
 	// Bunny and Egg1 Collide //
@@ -324,7 +567,8 @@ do
 			egg1y = Random(0, GetVirtualHeight() - GetSpriteHeight(2))
 			SetSpritePosition(2, egg1x, egg1y)
 		endwhile
-		score = score + 1
+		score = score + egg1value
+		timevalue1 = 0
 		SetTextString(1, "Score: " + str(score))
 	endif
 	
@@ -335,19 +579,11 @@ do
 			egg2y = Random(0, GetVirtualHeight() - GetSpriteHeight(2))
 			SetSpritePosition(3, egg2x, egg2y)
 		endwhile
-		score = score + 1
+		score = score + egg2value
+		timevalue2 = 0
 		SetTextString(1, "Score: " + str(score))
 	endif
 	
-	// Bunny and Rock Collide
-	for x = 8 to 18
-		if GetSpriteExists(x) = 1
-			if GetSpriteCollision(1, x)
-				DeleteSprite(x)
-			endif
-		endif
-	next
-
     Sync()
 loop
 
@@ -383,7 +619,15 @@ finalscorex = GetVirtualWidth()/2 - GetTextTotalWidth(6)/2
 finalscorey = GetVirtualHeight()/2 - GetTextTotalHeight(6)
 SetTextPosition(6, finalscorex, finalscorey)
 
-// **** End Screen **** //
+// X Button //
+CreateText(19, "X")
+SetTextSize(19, 30)
+SetTextColor(19, 255, 0, 0, 255)
+quitx = GetVirtualWidth() - GetTextTotalWidth(19) - 10
+quity = 0
+SetTextPosition(19, quitx, quity)
+
+// **** End Screen Commands **** //
 do 
 	// Main Menu Commands //
 	if GetTextHitTest(3, GetPointerX(), GetPointerY())
@@ -420,6 +664,69 @@ do
 		exity = GetVirtualHeight()*2/3 - GetTextTotalHeight(4)/2
 		SetTextPosition(4, exitx, exity)
 	endif
+	
+		// **** Quit Commands **** //
+	if GetTextHitTest(19, GetPointerX(), GetPointerY())
+		if GetPointerReleased() = 1
+			end
+		endif
+	endif
+	
 	sync()
 loop	
 loop
+
+tutorial:
+// **** Tutorial Page ****//
+	
+	// Tutorial Background //
+	tutorialback = 8
+	CreateSprite(tutorialback, 4)
+	SetSpriteSize(tutorialback, GetVirtualWidth(), GetVirtualHeight())
+	SetSpriteDepth(tutorialback, 8)
+	
+	// Back Button //
+	back = CreateText("back")
+	SetTextDepth(back, 0)
+	SetTextSize(back, 50)
+	SetTextColor(back, 255, 0, 0, 255)
+	backx = GetVirtualWidth()/2 - GetTextTotalWidth(back)/2
+	backy = GetVirtualHeight() - GetTextTotalHeight(back)
+	SetTextPosition(back, backx, backy)
+	
+	// Point 1 //
+	CreateText(12, "1. Use WASD to move Mr. FluffyBoots")
+	SetTextDepth(12, 0)
+	SetTextSize(12, 40)
+	SetTextColor(12, 179, 20, 211, 255) // Purple
+	point1x = GetVirtualWidth()/2 - GetTextTotalWidth(12)/2
+	point1y = GetVirtualHeight()/2 - GetTextTotalHeight(12)*2
+	SetTextPosition(12, point1x, point1y)
+	
+	// Point 2 //
+	CreateText(13, "2. Collect the eggs to gain points")
+	SetTextDepth(13, 0)
+	SetTextSize(13, 40)
+	SetTextColor(13, 179, 20, 211, 255)
+	point2x = GetVirtualWidth()/2 - GetTextTotalWidth(13)/2
+	point2y = GetVirtualHeight()/2 - GetTextTotalHeight(13)
+	SetTextPosition(13, point2x, point2y)
+	
+	// Point 3 //
+	CreateText(14, "3. Eggs lose their value if left unpicked")
+	SetTextDepth(14, 0)
+	SetTextSize(14, 40)
+	SetTextColor(14, 179, 20, 211, 255)
+	point3x = GetVirtualWidth()/2 - GetTextTotalWidth(14)/2
+	point3y = GetVirtualHeight()/2
+	SetTextPosition(14, point3x, point3y)
+	
+	// Point 4 //
+	CreateText(15, "4. Have Fun!!!")
+	SetTextDepth(15, 0)
+	SetTextSize(15, 50)
+	SetTextColor(15, 179, 20, 211, 255)
+	point4x = GetVirtualWidth()/2 - GetTextTotalWidth(15)/2
+	point4y = GetVirtualHeight()/2 + GetTextTotalHeight(15)
+	SetTextPosition(15, point4x, point4y)
+return
