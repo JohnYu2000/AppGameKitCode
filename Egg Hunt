@@ -18,8 +18,7 @@ SetScissor( 0,0,0,0 ) // use the maximum available screen space, no black border
 UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
 
 //// ******** To-Do List ******** ////
-
-// 1. Add title for start screen //
+// Add Fox //
 
 /* Notes:
 Subroutines are a programming tool that separates 
@@ -50,6 +49,9 @@ timevalue1 = 0 // Keeps track of how long egg1 has existed
 timevalue2 = 0 // Keeps track of how long egg2 has existed
 devalue1 = 0 // First Instance that eggs devalue
 devalue2 = 0 // Second Instance that eggs devalue
+red = 0
+green = 0
+blue = 0
 	
 // **** Images **** //
 LoadImage(1, "bunny.png")
@@ -90,8 +92,49 @@ quitx = GetVirtualWidth() - GetTextTotalWidth(16) - 10
 quity = 0
 SetTextPosition(16, quitx, quity)
 
+// Title //
+title = CreateText("EGG HUNT")
+SetTextColor(title, 0, 255, 255, 255)
+SetTextSize(title, 50)
+titlex = GetVirtualWidth()/2 - GetTextTotalWidth(title)/2
+titley = 0
+SetTextPosition(title, titlex, titley)
+
 // Start Menu Commands //
 do
+	// Title Commands //
+	if GetTextColorRed(title) <= 0 or red = 1
+		red = 1
+		SetTextColorRed(title, GetTextColorRed(title) + 1)
+		SetTextColorGreen(title, GetTextColorGreen(title) - 1)
+		if GetTextColorGreen(title) <= 0 
+			SetTextColorGreen(title, 0)
+		endif
+		if GetTextColorRed(title) >= 255 and GetTextColorGreen(title) <= 0
+			red = 0
+		endif
+	elseif GetTextColorGreen(title) <= 0 or green = 1
+		green = 1
+		SetTextColorGreen(title, GetTextColorGreen(title) + 1)
+		SetTextColorBlue(title, GetTextColorBlue(title) - 1)
+		if GetTextColorBlue(title) <= 0
+			SetTextColorBlue(title, 0)
+		endif
+		if GetTextColorGreen(title) >= 255 and GetTextColorBlue(title) <= 0
+			green = 0
+		endif
+	elseif GetTextColorBlue(title) <= 0 or blue = 1
+		blue = 1
+		SetTextColorBlue(title, GetTextColorBlue(title) + 1)
+		SetTextColorRed(title, GetTextColorRed(title) - 1)
+		if GetTextColorRed(title) <= 0
+			SetTextColorRed(title, 0)
+		endif
+		if GetTextColorBlue(title) >= 255 and GetTextColorRed(title) <= 0
+			blue = 0
+		endif
+	endif
+	
 	// Play Button Commands //
 	if GetTextHitTest(play, GetPointerX(), GetPointerY())
 		SetTextSize(play, 55)
