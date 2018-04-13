@@ -17,6 +17,9 @@ SetSyncRate( 30, 0 ) // 30fps instead of 60 to save battery
 SetScissor( 0,0,0,0 ) // use the maximum available screen space, no black borders
 UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
 
+// **** To-Do List **** //
+// Enemy changes color like open screen //
+
 // **** Variables (one time use) **** //
 openbackred = 255
 openbackgreen = 0
@@ -27,6 +30,7 @@ alpha3 = 0
 introtime = 0
 jyutime = 0
 chintime = 0
+highscore = 0
 
 // **** Intro and Credits **** //
 // *** Goldtruffle Productions *** //
@@ -108,7 +112,7 @@ SetSpriteSize(jyuback, GetVirtualWidth(), GetVirtualHeight())
 
 // Created By //
 create = CreateText("Created By")
-SetTextSize(create, 40)
+SetTextSize(create, 25)
 SetTextColor(create, 225, 0, 0, alpha2)
 createx = GetVirtualWidth()/2 - GetTextTotalWidth(create)/2
 createy = GetVirtualHeight()/2 - GetTextTotalHeight(create)
@@ -252,9 +256,9 @@ SetTextPosition(play, playx, playy)
 
 // **** Opening Commands **** //
 do
-	Print(GetSpriteColorRed(openback))
-	Print(GetSpriteColorGreen(openback))
-	Print(GetSpriteColorBlue(openback))
+	//Print(GetSpriteColorRed(openback))
+	//Print(GetSpriteColorGreen(openback))
+	//Print(GetSpriteColorBlue(openback))
 	gosub openbackcolor	
 	// Play Commands //
 	if GetTextHitTest(play, GetPointerX(), GetPointerY())
@@ -356,6 +360,14 @@ quitx = GetVirtualWidth()/2 - GetTextTotalWidth(quit)/2
 quity = GetVirtualHeight()/2 + GetTextTotalHeight(quit) + 5
 SetTextPosition(quit, quitx, quity)
 
+// High Score //
+highscoretext = CreateText("Highscore: " + str(highscore))
+SetTextSize(highscoretext, 30)
+SetTextColor(highscoretext, 255, 255, 255, 255)
+highscoretextx = GetVirtualWidth()/2 - GetTextTotalWidth(highscoretext)/2
+highscoretexty = GetVirtualHeight()/2 - GetTextTotalHeight(displayscore)*2
+SetTextPosition(highscoretext, highscoretextx, highscoretexty)
+
 // **** End Commands **** //
 do
 	// Main Menu Commands //
@@ -448,6 +460,9 @@ return
 // **** Timekeeping (In-game) **** //
 scorekeeping:
 	score = score + 1
+	if score >= highscore
+		highscore = score
+	endif
 	playerspeed = 5 + score/60
 	enemyspeed = score/30
 	SetTextString(scoretext, "Score: " + str(score))
