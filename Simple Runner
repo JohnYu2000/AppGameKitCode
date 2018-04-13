@@ -58,8 +58,8 @@ productionsy = GetVirtualHeight()/2
 SetTextPosition(productions, productionsx, productionsy)
 
 // **** Goldtruffle Productions Commands **** //
-do
-// Alpha Increases //
+
+// Alpha1 Increases //
 do
 	alpha1 = alpha1 + 4
 	if alpha1 >= 255
@@ -70,14 +70,14 @@ do
 	SetTextColorAlpha(productions, alpha1)
 	if alpha1 >= 255
 		introtime = introtime + 1
-		if introtime = 30
+		if introtime = 15
 			exit
 		endif
 	endif
 	sync()
 loop
 
-// Alpha Decreases
+// Alpha1 Decreases
 do
 	alpha1 = alpha1 - 4
 	if alpha1 <= 0
@@ -92,8 +92,6 @@ do
 		exit
 	endif
 	sync()
-loop
-exit
 loop
 
 // *** Creator: John Yu *** //
@@ -113,7 +111,7 @@ create = CreateText("Created By")
 SetTextSize(create, 40)
 SetTextColor(create, 225, 0, 0, alpha2)
 createx = GetVirtualWidth()/2 - GetTextTotalWidth(create)/2
-createy = GetVirtualHeight()/2 - GetTextTotalHeight(create)/2
+createy = GetVirtualHeight()/2 - GetTextTotalHeight(create)
 SetTextPosition(create, createx, createy)
 
 // John Yu //
@@ -121,12 +119,12 @@ jyu = CreateText("John Yu")
 SetTextSize(jyu, 40)
 SetTextColor(jyu, 255, 0, 0, alpha2)
 jyux = GetVirtualWidth()/2 - GetTextTotalWidth(jyu)/2
-jyuy = GetVirtualHeight()/2 + GetTextTotalHeight(jyu)/2
+jyuy = GetVirtualHeight()/2
 SetTextPosition(jyu, jyux, jyuy)
 
 // **** John Yu Commands **** //
-do
-	// Alpha Increases //
+
+	// Alpha2 Increases //
 do
 	alpha2 = alpha2 + 4
 	if alpha2 >= 255
@@ -137,14 +135,14 @@ do
 	SetTextColorAlpha(jyu, alpha2)
 	if alpha2 >= 255
 		jyutime = jyutime + 1
-		if jyutime = 30
+		if jyutime = 15
 			exit
 		endif
 	endif
 	sync()
 loop
 
-// Alpha Decreases
+// Alpha2 Decreases
 do
 	alpha2 = alpha2 - 4
 	if alpha2 <= 0
@@ -159,8 +157,6 @@ do
 		exit
 	endif
 	sync()
-loop
-exit
 loop
 
 // *** Chimmay Patil *** //
@@ -177,7 +173,7 @@ SetSpriteSize(chinback, GetVirtualWidth(), GetVirtualHeight())
 
 // Featuring //
 featuring = CreateText("In Collaboration with")
-SetTextSize(featuring, 30)
+SetTextSize(featuring, 20)
 SetTextColor(featuring, 204, 116, 19, alpha3)
 featuringx = GetVirtualWidth()/2 - GetTextTotalWidth(featuring)/2
 featuringy = GetVirtualHeight()/2 - GetTextTotalHeight(featuring)
@@ -192,8 +188,8 @@ chiny = GetVirtualHeight()/2
 SetTextPosition(chin, chinx, chiny)
 
 // **** Chinmay Patil Commands **** //
-do
-	// Alpha Increases //
+
+	// Alpha3 Increases //
 do
 	alpha3 = alpha3 + 4
 	if alpha3 >= 255
@@ -204,14 +200,14 @@ do
 	SetTextColorAlpha(featuring, alpha3)
 	if alpha3 >= 255
 		chintime = chintime + 1
-		if chintime = 30
+		if chintime = 15
 			exit
 		endif
 	endif
 	sync()
 loop
 
-// Alpha Decreases
+// Alpha3 Decreases
 do
 	alpha3 = alpha3 - 4
 	if alpha3 <= 0
@@ -226,8 +222,6 @@ do
 		exit
 	endif
 	sync()
-loop
-exit
 loop
 
 // **** Code Starts Here //
