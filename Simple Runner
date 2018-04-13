@@ -1,0 +1,478 @@
+// Project: Simple Runner
+// Author: John Yu 
+// Created: 2018-04-12
+
+// show all errors
+SetErrorMode(2)
+
+// set window properties
+SetWindowTitle( "Simple Runner" )
+SetWindowSize( 640, 480, 0 )
+SetWindowAllowResize( 1 ) // allow the user to resize the window
+
+// set display properties
+SetVirtualResolution( 320, 640 ) // doesn't have to match the window
+SetOrientationAllowed( 1, 1, 1, 1 ) // allow both portrait and landscape on mobile devices
+SetSyncRate( 30, 0 ) // 30fps instead of 60 to save battery
+SetScissor( 0,0,0,0 ) // use the maximum available screen space, no black borders
+UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
+
+// **** Variables (one time use) **** //
+openbackred = 255
+openbackgreen = 0
+openbackblue = 0
+alpha1 = 0
+alpha2 = 0
+alpha3 = 0
+introtime = 0
+jyutime = 0
+chintime = 0
+
+// **** Intro and Credits **** //
+// *** Goldtruffle Productions *** //
+// Default Screen //
+CreateImageColor(5, 255, 255, 255, 255)
+defaultscreen = CreateSprite(5)
+SetSpriteSize(defaultscreen, GetVirtualWidth(), GetVirtualHeight())
+
+// Background //
+CreateImageColor(4, 255, 215, 0, 255) // Gold
+goldback = CreateSprite(4)
+SetSpriteColor(goldback, 255, 215, 0, alpha1)
+SetSpriteSize(goldback, GetVirtualWidth(), GetVirtualHeight())
+
+// Name top //
+goldtruffle = CreateText("Goldtruffle")
+SetTextSize(goldtruffle, 40)
+SetTextColor(goldtruffle, 255, 0, 0, alpha1)
+goldtrufflex = GetVirtualWidth()/2 - GetTextTotalWidth(goldtruffle)/2
+goldtruffley = GetVirtualHeight()/2 - GetTextTotalHeight(goldtruffle)
+SetTextPosition(goldtruffle, goldtrufflex, goldtruffley)
+
+// Name bot //
+productions = CreateText("Productions")
+SetTextSize(productions, 40)
+SetTextColor(productions, 255, 0, 0, alpha1)
+productionsx = GetVirtualWidth()/2 - GetTextTotalWidth(productions)/2
+productionsy = GetVirtualHeight()/2 
+SetTextPosition(productions, productionsx, productionsy)
+
+// **** Goldtruffle Productions Commands **** //
+do
+// Alpha Increases //
+do
+	alpha1 = alpha1 + 4
+	if alpha1 >= 255
+		alpha1 = 255
+	endif
+	SetSpriteColorAlpha(goldback, alpha1)
+	SetTextColorAlpha(goldtruffle, alpha1)
+	SetTextColorAlpha(productions, alpha1)
+	if alpha1 >= 255
+		introtime = introtime + 1
+		if introtime = 30
+			exit
+		endif
+	endif
+	sync()
+loop
+
+// Alpha Decreases
+do
+	alpha1 = alpha1 - 4
+	if alpha1 <= 0
+		alpha1 = 0
+	endif
+		SetSpriteColorAlpha(goldback, alpha1)
+	SetTextColorAlpha(goldtruffle, alpha1)
+	SetTextColorAlpha(productions, alpha1)
+	if alpha1 <= 0
+		DeleteAllText()
+		DeleteAllSprites()
+		exit
+	endif
+	sync()
+loop
+exit
+loop
+
+// *** Creator: John Yu *** //
+// Default Screen //
+CreateImageColor(6, 255, 255, 255, 255)
+defaultscreen = CreateSprite(6)
+SetSpriteSize(defaultscreen, GetVirtualWidth(), GetVirtualHeight())
+
+// John Yu Background//
+CreateImageColor(7, 65, 192, 235, 255)
+jyuback = CreateSprite(7)
+SetSpriteColor(jyuback, 65, 192, 235, alpha2)
+SetSpriteSize(jyuback, GetVirtualWidth(), GetVirtualHeight())
+
+// Created By //
+create = CreateText("Created By")
+SetTextSize(create, 40)
+SetTextColor(create, 225, 0, 0, alpha2)
+createx = GetVirtualWidth()/2 - GetTextTotalWidth(create)/2
+createy = GetVirtualHeight()/2 - GetTextTotalHeight(create)/2
+SetTextPosition(create, createx, createy)
+
+// John Yu //
+jyu = CreateText("John Yu")
+SetTextSize(jyu, 40)
+SetTextColor(jyu, 255, 0, 0, alpha2)
+jyux = GetVirtualWidth()/2 - GetTextTotalWidth(jyu)/2
+jyuy = GetVirtualHeight()/2 + GetTextTotalHeight(jyu)/2
+SetTextPosition(jyu, jyux, jyuy)
+
+// **** John Yu Commands **** //
+do
+	// Alpha Increases //
+do
+	alpha2 = alpha2 + 4
+	if alpha2 >= 255
+		alpha2 = 255
+	endif
+	SetSpriteColorAlpha(jyuback, alpha2)
+	SetTextColorAlpha(create, alpha2)
+	SetTextColorAlpha(jyu, alpha2)
+	if alpha2 >= 255
+		jyutime = jyutime + 1
+		if jyutime = 30
+			exit
+		endif
+	endif
+	sync()
+loop
+
+// Alpha Decreases
+do
+	alpha2 = alpha2 - 4
+	if alpha2 <= 0
+		alpha2 = 0
+	endif
+		SetSpriteColorAlpha(jyuback, alpha2)
+	SetTextColorAlpha(create, alpha2)
+	SetTextColorAlpha(jyu, alpha2)
+	if alpha2 <= 0
+		DeleteAllText()
+		DeleteAllSprites()
+		exit
+	endif
+	sync()
+loop
+exit
+loop
+
+// *** Chimmay Patil *** //
+// Default Screen //
+CreateImageColor(8, 255, 255, 255, 255)
+defaultscreen = CreateSprite(8)
+SetSpriteSize(defaultscreen, GetVirtualWidth(), GetVirtualHeight())
+
+// Chinmay Patil Background//
+CreateImageColor(9, 81, 225, 222, 255)
+chinback = CreateSprite(9)
+SetSpriteColor(chinback, 81, 225, 222, alpha3)
+SetSpriteSize(chinback, GetVirtualWidth(), GetVirtualHeight())
+
+// Featuring //
+featuring = CreateText("In Collaboration with")
+SetTextSize(featuring, 30)
+SetTextColor(featuring, 204, 116, 19, alpha3)
+featuringx = GetVirtualWidth()/2 - GetTextTotalWidth(featuring)/2
+featuringy = GetVirtualHeight()/2 - GetTextTotalHeight(featuring)
+SetTextPosition(featuring, featuringx, featuringy)
+
+// Chinmay Patil //
+chin = CreateText("Chinmay Patil")
+SetTextSize(chin, 40)
+SetTextColor(chin, 204, 116, 19, alpha3)
+chinx = GetVirtualWidth()/2 - GetTextTotalWidth(chin)/2
+chiny = GetVirtualHeight()/2 
+SetTextPosition(chin, chinx, chiny)
+
+// **** Chinmay Patil Commands **** //
+do
+	// Alpha Increases //
+do
+	alpha3 = alpha3 + 4
+	if alpha3 >= 255
+		alpha3 = 255
+	endif
+	SetSpriteColorAlpha(chinback, alpha3)
+	SetTextColorAlpha(chin, alpha3)
+	SetTextColorAlpha(featuring, alpha3)
+	if alpha3 >= 255
+		chintime = chintime + 1
+		if chintime = 30
+			exit
+		endif
+	endif
+	sync()
+loop
+
+// Alpha Decreases
+do
+	alpha3 = alpha3 - 4
+	if alpha3 <= 0
+		alpha3 = 0
+	endif
+		SetSpriteColorAlpha(chinback, alpha3)
+	SetTextColorAlpha(chin, alpha3)
+	SetTextColorAlpha(featuring, alpha3)
+	if alpha3 <= 0
+		DeleteAllText()
+		DeleteAllSprites()
+		exit
+	endif
+	sync()
+loop
+exit
+loop
+
+// **** Code Starts Here //
+do
+// **** Variables **** //
+ingamebackground = 99
+endgamebackground = 100
+playerspeed = 5
+enemyspeed = 0
+score = 0
+time = 0 // References the FPS for timekeeping
+second = 0 // Actual unit used for calculation
+
+// **** Opening Sprite**** //
+// Opening Background //
+CreateImageColor(3, 255, 255, 255, 255)
+openback = CreateSprite(3)
+SetSpriteColor(openback, openbackred, openbackgreen, openbackblue, 255)
+SetSpriteSize(openback, GetVirtualWidth(), GetVirtualHeight())
+
+// Play Button //
+play = CreateText("PLAY")
+SetTextSize(play, 30)
+SetTextColor(play, 0, 0, 0, 255)
+playx = GetVirtualWidth()/2 - GetTextTotalWidth(play)/2
+playy = GetVirtualHeight()/2 - GetTextTotalHeight(play)
+SetTextPosition(play, playx, playy)
+
+// **** Opening Commands **** //
+do
+	Print(GetSpriteColorRed(openback))
+	Print(GetSpriteColorGreen(openback))
+	Print(GetSpriteColorBlue(openback))
+	gosub openbackcolor	
+	// Play Commands //
+	if GetTextHitTest(play, GetPointerX(), GetPointerY())
+		SetTextSize(play, 35)
+		playx = GetVirtualWidth()/2 - GetTextTotalWidth(play)/2
+		playy = GetVirtualHeight()/2 - GetTextTotalHeight(play)
+		SetTextPosition(play, playx, playy)
+		if GetPointerPressed() = 1
+			sync()
+			openbackred = GetSpriteColorRed(openback)
+			openbackgreen = GetSpriteColorGreen(openback)
+			openbackblue = GetSpriteColorBlue(openback)
+			DeleteAllImages()
+			DeleteAllSprites()
+			DeleteAllText()
+			exit
+		endif
+	else
+		SetTextSize(play, 30)
+		playx = GetVirtualWidth()/2 - GetTextTotalWidth(play)/2
+		playy = GetVirtualHeight()/2 - GetTextTotalHeight(play)
+		SetTextPosition(play, playx, playy)
+	endif
+	sync()
+loop
+
+// **** Create In-Game Sprites **** //
+// Background //
+CreateImageColor(ingamebackground, 50,  50, 50, 255)
+CreateSprite(ingamebackground, ingamebackground)
+SetSpriteSize(ingamebackground, GetVirtualWidth(), GetVirtualHeight())
+
+// Player Sprite //
+CreateImageColor(1, 255, 255, 255, 255)
+CreateSprite(1, 1)
+SetSpriteSize(1, 20, 20)
+playerx = Random(0, GetVirtualWidth() - GetSpriteWidth(1))
+playery = GetVirtualHeight() - GetSpriteHeight(1) - 10
+SetSpritePosition(1, playerx, playery)
+
+// Enemy Sprite //
+CreateImageColor(2, 255, 0, 0, 255)
+CreateSprite(2, 2)
+enemyw = Random(40, 100)
+enemyh = Random(60, 80)
+SetSpriteSize(2, enemyw, enemyh)
+enemyx = Random(0, GetVirtualWidth() - GetSpriteWidth(2))
+enemyy = 0
+SetSpritePosition(2, enemyx, enemyy)
+
+// Scoreboard //
+scoretext = CreateText("Score: " + str(score))
+SetTextSize(scoretext, 30)
+SetTextColor(scoretext, 255, 255, 255, 255)
+
+// **** In-Game Commands **** //
+do
+	gosub scorekeeping
+    gosub playermovement
+	gosub enemymovement
+	if GetSpriteCollision(1, 2) = 1
+		// Change to exit later //
+		exit
+	endif
+	time = time + 1
+	if time = 30
+		second = second + 1
+		time = 0
+	endif
+    Sync()
+loop
+
+// **** End Game Sprites **** //
+// Background //
+CreateSprite(endgamebackground, ingamebackground)
+SetSpriteSize(endgamebackground, GetVirtualWidth(), GetVirtualHeight())
+
+// Display Score //
+displayscore = CreateText("Your Score: " + str(score))
+SetTextSize(displayscore, 30)
+SetTextColor(displayscore, 255, 255, 255, 255)
+displayscorex = GetVirtualWidth()/2 - GetTextTotalWidth(displayscore)/2
+displayscorey = GetVirtualHeight()/2 - GetTextTotalHeight(displayscore)
+SetTextPosition(displayscore, displayscorex, displayscorey)
+
+// Main Menu Text //
+mainmenu = CreateText("MAIN MENU")
+SetTextSize(mainmenu, 30)
+SetTextColor(mainmenu, 255, 255, 255, 255)
+mainmenux = GetVirtualWidth()/2 - GetTextTotalWidth(mainmenu)/2
+mainmenuy = GetVirtualHeight()/2
+SetTextPosition(mainmenu, mainmenux, mainmenuy)
+
+// Quit Text //
+quit = CreateText("QUIT")
+SetTextSize(quit, 25)
+SetTextColor(quit, 255, 255, 255, 255)
+quitx = GetVirtualWidth()/2 - GetTextTotalWidth(quit)/2
+quity = GetVirtualHeight()/2 + GetTextTotalHeight(quit) + 5
+SetTextPosition(quit, quitx, quity)
+
+// **** End Commands **** //
+do
+	// Main Menu Commands //
+	if GetTextHitTest(mainmenu, GetPointerX(), GetPointerY()) = 1
+		SetTextSize(mainmenu, 35)
+		mainmenux = GetVirtualWidth()/2 - GetTextTotalWidth(mainmenu)/2
+		mainmenuy = GetVirtualHeight()/2
+		SetTextPosition(mainmenu, mainmenux, mainmenuy)
+		if GetPointerPressed() = 1
+			sync()
+			DeleteAllText()
+			DeleteAllSprites()
+			DeleteAllImages()
+
+			exit
+		endif
+	else
+		SetTextSize(mainmenu, 30)
+		mainmenux = GetVirtualWidth()/2 - GetTextTotalWidth(mainmenu)/2
+		mainmenuy = GetVirtualHeight()/2
+		SetTextPosition(mainmenu, mainmenux, mainmenuy)
+	endif
+	
+	// Quit Commands //
+	gosub quit
+	sync()
+loop
+loop
+
+// **** Opening Background **** //
+openbackcolor:
+	if GetSpriteColorRed(openback) >= 255 
+		if GetSpriteColorBlue(openback) >= 2
+			SetSpriteColorBlue(openback, GetSpriteColorBlue(openback) - 2)
+		else
+			if GetSpriteColorGreen(openback) < 255
+				SetSpriteColorGreen(openback, GetSpriteColorGreen(openback) + 2)
+			endif
+		endif				
+	endif
+	if GetSpriteColorGreen(openback) >= 255 
+		if GetSpriteColorRed(openback) >= 2
+			SetSpriteColorRed(openback, GetSpriteColorRed(openback) - 2)
+		else
+			if GetSpriteColorBlue(openback) < 255
+				SetSpriteColorBlue(openback, GetSpriteColorBlue(openback) + 2)
+			endif
+		endif				
+	endif
+	if GetSpriteColorBlue(openback) >= 255 
+		if GetSpriteColorGreen(openback) >= 2
+			SetSpriteColorGreen(openback, GetSpriteColorGreen(openback) - 2)
+		else
+			if GetSpriteColorRed(openback) < 255
+				SetSpriteColorRed(openback, GetSpriteColorRed(openback) + 2)
+			endif
+		endif		
+	endif
+return
+
+// **** Player Movement **** //
+playermovement:
+	if GetRawKeyState(65) = 1 // "a" key
+		if playerx >= playerspeed
+			playerx = playerx - playerspeed
+		endif
+	endif
+	if GetRawKeyState(68) = 1 // "d" key
+		if playerx <= GetVirtualWidth() - GetSpriteWidth(1) - playerspeed
+			playerx = playerx + playerspeed
+		endif
+	endif
+	SetSpritePosition(1, playerx, playery)
+return
+
+// **** Enemy Movement **** //
+enemymovement:
+	enemyy = enemyy + enemyspeed
+	if enemyy >= GetVirtualHeight() + 10
+		enemyw = Random(40, 100)
+		enemyh = Random(60, 80)
+		SetSpriteSize(2, enemyw, enemyh)
+		enemyx = Random(0, GetVirtualWidth() - GetSpriteWidth(2))
+		enemyy = -GetSpriteHeight(2)
+		SetSpritePosition(2, enemyx, enemyy)
+	endif
+	SetSpritePosition(2, enemyx, enemyy)
+return
+
+// **** Timekeeping (In-game) **** //
+scorekeeping:
+	score = score + 1
+	playerspeed = 5 + score/60
+	enemyspeed = score/30
+	SetTextString(scoretext, "Score: " + str(score))
+return
+
+// **** Quit Commands **** //
+quit:
+	if GetTextHitTest(quit, GetPointerX(), GetPointerY()) = 1
+		SetTextSize(quit, 30)
+		quitx = GetVirtualWidth()/2 - GetTextTotalWidth(quit)/2
+		quity = GetVirtualHeight()/2 + GetTextTotalHeight(quit) + 5
+		SetTextPosition(quit, quitx, quity)
+		if GetPointerPressed() = 1
+			end
+		endif
+	else
+		SetTextSize(quit, 25)
+		quitx = GetVirtualWidth()/2 - GetTextTotalWidth(quit)/2
+		quity = GetVirtualHeight()/2 + GetTextTotalHeight(quit) + 5
+		SetTextPosition(quit, quitx, quity)
+	endif
+return
