@@ -19,6 +19,8 @@ UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
 
 // **** To-Do List **** //
 // Enemy changes color like open screen //
+// Smoother transition to opening //
+// Add World Record, 1979 //
 
 // **** Variables (one time use) **** //
 openbackred = 255
@@ -27,9 +29,11 @@ openbackblue = 0
 alpha1 = 0
 alpha2 = 0
 alpha3 = 0
+alpha4 = 0
 introtime = 0
 jyutime = 0
 chintime = 0
+titletime = 0
 highscore = 0
 
 // **** Intro and Credits **** //
@@ -74,7 +78,7 @@ do
 	SetTextColorAlpha(productions, alpha1)
 	if alpha1 >= 255
 		introtime = introtime + 1
-		if introtime = 15
+		if introtime = 12
 			exit
 		endif
 	endif
@@ -139,7 +143,7 @@ do
 	SetTextColorAlpha(jyu, alpha2)
 	if alpha2 >= 255
 		jyutime = jyutime + 1
-		if jyutime = 15
+		if jyutime = 12
 			exit
 		endif
 	endif
@@ -204,7 +208,7 @@ do
 	SetTextColorAlpha(featuring, alpha3)
 	if alpha3 >= 255
 		chintime = chintime + 1
-		if chintime = 15
+		if chintime = 12
 			exit
 		endif
 	endif
@@ -221,6 +225,71 @@ do
 	SetTextColorAlpha(chin, alpha3)
 	SetTextColorAlpha(featuring, alpha3)
 	if alpha3 <= 0
+		DeleteAllText()
+		DeleteAllSprites()
+		exit
+	endif
+	sync()
+loop
+
+// *** Title Screen *** //
+// Default Screen //
+CreateImageColor(10, 255, 255, 255, 255)
+defaultscreen = CreateSprite(10)
+SetSpriteSize(defaultscreen, GetVirtualWidth(), GetVirtualHeight())
+
+// Title Background//
+CreateImageColor(11, 255, 0, 255, 255)
+titleback = CreateSprite(11)
+SetSpriteColor(titleback, 255, 0, 255, alpha4)
+SetSpriteSize(titleback, GetVirtualWidth(), GetVirtualHeight())
+
+// Simple //
+simple = CreateText("Simple")
+SetTextSize(simple, 40)
+SetTextColor(simple, 0, 255, 0, alpha4)
+simplex = GetVirtualWidth()/2 - GetTextTotalWidth(simple)/2
+simpley = GetVirtualHeight()/2 - GetTextTotalHeight(simple)
+SetTextPosition(simple, simplex, simpley)
+
+// Runner //
+runner = CreateText("Runner")
+SetTextSize(runner, 40)
+SetTextColor(runner, 0, 255, 0, alpha4)
+runnerx = GetVirtualWidth()/2 - GetTextTotalWidth(runner)/2
+runnery = GetVirtualHeight()/2 
+SetTextPosition(runner, runnerx, runnery)
+
+// **** Title Screen Commands **** //
+
+	// alpha4 Increases //
+do
+	alpha4 = alpha4 + 4
+	if alpha4 >= 255
+		alpha4 = 255
+	endif
+	SetSpriteColorAlpha(titleback, alpha4)
+	SetTextColorAlpha(simple, alpha4)
+	SetTextColorAlpha(runner, alpha4)
+	if alpha4 >= 255
+		titletime = titletime + 1
+		if titletime = 12
+			exit
+		endif
+	endif
+	sync()
+loop
+
+// alpha4 Decreases
+do
+	alpha4 = alpha4 - 4
+	if alpha4 <= 0
+		alpha4 = 0
+	endif
+		SetSpriteColorAlpha(titleback, alpha4)
+		SetTextColorAlpha(simple, alpha4)		
+		SetTextColorAlpha(runner, alpha4)
+	if alpha4 <= 0
 		DeleteAllText()
 		DeleteAllSprites()
 		exit
