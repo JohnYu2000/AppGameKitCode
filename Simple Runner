@@ -337,6 +337,8 @@ do
 		SetTextPosition(play, playx, playy)
 		if GetPointerPressed() = 1
 			sync()
+			time2 = Timer()
+			ResetTimer()
 			openbackred = GetSpriteColorRed(openback)
 			openbackgreen = GetSpriteColorGreen(openback)
 			openbackblue = GetSpriteColorBlue(openback)
@@ -383,13 +385,23 @@ scoretext = CreateText("Score: " + str(score))
 SetTextSize(scoretext, 30)
 SetTextColor(scoretext, 255, 255, 255, 255)
 
+// Timekeeping //
+timetext = CreateText("Time: " + str(time2))
+SetTextSize(timetext, 30)
+SetTextColor(timetext, 255, 255, 255, 255)
+timetextx = 0
+timetexty = GetTextTotalHeight(scoretext)
+SetTextPosition(timetext, timetextx, timetexty)
+
 // **** In-Game Commands **** //
 do
+	gosub timekeeping
 	gosub scorekeeping
     gosub playermovement
 	gosub enemymovement
 	if GetSpriteCollision(1, 2) = 1
 		// Change to exit later //
+		DeleteAllText()
 		exit
 	endif
 	time = time + 1
@@ -526,15 +538,20 @@ enemymovement:
 	SetSpritePosition(2, enemyx, enemyy)
 return
 
-// **** Timekeeping (In-game) **** //
+// **** Scorekeeping (In-game) **** //
 scorekeeping:
 	score = score + 1
 	if score >= highscore
 		highscore = score
 	endif
-	playerspeed = 5 + score/60
-	enemyspeed = score/30
+	playerspeed = 5 + time2/2
+	enemyspeed = time2
 	SetTextString(scoretext, "Score: " + str(score))
+return
+
+timekeeping:
+	time2 = GetSeconds()
+	SetTextString(timetext, "Time: " + str(time2))
 return
 
 // **** Quit Commands **** //
