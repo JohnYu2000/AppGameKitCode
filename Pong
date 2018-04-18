@@ -17,7 +17,25 @@ SetSyncRate( 30, 0 ) // 30fps instead of 60 to save battery
 SetScissor( 0,0,0,0 ) // use the maximum available screen space, no black borders
 UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
 
+// **** Images to Download **** //
+/*
+// Fire //
+https://www.google.ca/search?rlz=1C1CHBF_enCA788CA788&biw=1536&bih=710&tbm=isch&sa=1&ei=5Y3WWq7fLsnRjwTPzLCYAw&q=fire+symbol+avatar&oq=fire+symbol+avatar&gs_l=psy-ab.3..0l2j0i8i30k1l2.6863.9411.0.9542.20.16.1.3.3.0.154.1514.2j11.13.0....0...1c.1.64.psy-ab..3.17.1520...0i67k1j0i10i24k1.0.k91PeBsijvY#imgrc=z3c1_wIXDI_1EM:
+	
+// Water //
+https://www.google.ca/search?rlz=1C1CHBF_enCA788CA788&biw=1536&bih=759&tbm=isch&sa=1&ei=wJ3WWqLcD4fcjwS9wI-4Cw&q=water+symbol+avatar&oq=water+symbol+avatar&gs_l=psy-ab.3..0i7i30k1l6j0i8i7i30k1l4.23580.23979.0.24061.5.5.0.0.0.0.117.117.0j1.1.0....0...1c.1.64.psy-ab..4.1.117....0.XvxfwRWYbcE#imgrc=Y98hb2MXrgKOpM:
+	
+// Earth //
+https://www.google.ca/search?q=earth+symbol+avatar&rlz=1C1CHBF_enCA788CA788&source=lnms&tbm=isch&sa=X&ved=0ahUKEwi04YDg1MLaAhUL7YMKHbwwCBYQ_AUICigB&biw=1536&bih=759#imgrc=7SdA-W86TO6PCM:
+	
+// Air //
+https://www.google.ca/search?rlz=1C1CHBF_enCA788CA788&biw=1536&bih=710&tbm=isch&sa=1&ei=uJDWWsj5NIjEjwTGrZCgBA&q=air+symbol+avatar&oq=air+symbol+avatar&gs_l=psy-ab.3..0i7i30k1l3j0i8i7i30k1l7.139560.139762.0.139877.3.3.0.0.0.0.112.112.0j1.1.0....0...1c.1.64.psy-ab..2.1.111....0.6tEO2KYUUac#imgrc=-JOXNNEHFC6rjM:
+
+*/
 // **** To-Do List **** //
+/*
+1. Adjust character selection to suit both players
+*/
 
 // **** Variables (one time use)**** //
 
@@ -27,6 +45,7 @@ do
 // **** Image Colors **** //
 red = CreateImageColor(255, 0, 0, 255)
 white = CreateImageColor(255, 255, 255, 255)
+grey = CreateImageColor(50, 50, 50, 255)
 black = CreateImageColor(0, 0, 0, 255)
 
 //// ******** Code Starts Here ******** ////
@@ -34,14 +53,177 @@ black = CreateImageColor(0, 0, 0, 255)
 // **** Variables (reused after play again) **** //
 
 // **** Start Screen Sprites **** //
+
 // Start Screen Background //
-CreateSprite(1, black)
-setsprit
+startscreenbackground = CreateSprite(white)
+SetSpriteSize(startscreenbackground, GetVirtualWidth(), GetVirtualHeight())
+SetSpriteColor(startscreenbackground, 255, 0, 0, 255)
 
+// Title //
+pongtext = CreateText("Elemental-Pong")
+SetTextSize(pongtext, 50)
+SetTextColor(pongtext, 0, 255, 0, 255)
+pongtextx = GetVirtualWidth()/2 - GetTextTotalWidth(pongtext)/2
+pongtexty = 0
+SetTextPosition(pongtext, pongtextx, pongtexty)
+
+// Play Button //
+playtext = CreateText("PLAY")
+SetTextSize(playtext, 50)
+SetTextColor(playtext, 0, 0, 0, 255)
+playtextx = GetVirtualWidth()/2 - GetTextTotalWidth(playtext)/2
+playtexty = GetVirtualHeight()/2 - GetTextTotalHeight(playtext)
+SetTextPosition(playtext, playtextx, playtexty)
+
+// Help //
+helptext = CreateText("HELP")
+SetTextSize(helptext, 50)
+SetTextColor(helptext, 0, 0, 0, 255)
+helptextx = GetVirtualWidth()/2 - GetTextTotalWidth(helptext)/2
+helptexty = GetVirtualHeight()/2 
+SetTextPosition(helptext, helptextx, helptexty)
+
+// **** Start Screen Code **** //
 do
-    
-
-
+	gosub startscreenbackgroundcolor
+	gosub titlecolor
+	
+	// Play Button Commands //
+	if GetTextHitTest(playtext, GetPointerX(), GetPointerY()) = 1
+		SetTextSize(playtext, 55)
+		playtextx = GetVirtualWidth()/2 - GetTextTotalWidth(playtext)/2
+		playtexty = GetVirtualHeight()/2 - GetTextTotalHeight(playtext)
+		SetTextPosition(playtext, playtextx, playtexty)
+		if GetPointerPressed() = 1
+			sync()
+			DeleteAllText()
+			exit
+		endif
+	else
+		SetTextSize(playtext, 50)
+		playtextx = GetVirtualWidth()/2 - GetTextTotalWidth(playtext)/2
+		playtexty = GetVirtualHeight()/2 - GetTextTotalHeight(playtext)
+		SetTextPosition(playtext, playtextx, playtexty)
+	endif
+	
+	// Tutorial Button Commands //
+	
     Sync()
 loop
+
+// **** Character Selection **** //
+
+// Sprites //
+
+// Background //
+charselectback = CreateSprite(black)
+SetSpriteSize(charselectback, GetVirtualWidth(), GetVirtualHeight())
+
+
+// Fire Sprite //
+fireimage = LoadImage("fire.png")
+firesprite = CreateSprite(fireimage)
+SetSpriteScale(firesprite, (GetVirtualWidth()/10)/(GetSpriteWidth(firesprite)), (GetVirtualWidth()/10)/(GetSpriteWidth(firesprite)))
+firex = GetVirtualWidth()/5 - GetSpriteWidth(firesprite)/2
+firey = GetVirtualHeight()/2 - GetSpriteHeight(firesprite)
+SetSpritePosition(firesprite, firex, firey)
+
+// Water Sprite //
+waterimage = LoadImage("water.png")
+watersprite = CreateSprite(waterimage)
+//SetImageMinFilter(watersprite, 1)
+//SetImageMagFilter(watersprite, 1)
+SetSpriteScale(watersprite, (GetVirtualWidth()/10)/(GetSpriteWidth(watersprite)), (GetVirtualWidth()/10)/(GetSpriteWidth(watersprite)))
+waterx = GetVirtualWidth()*2/5 - GetSpriteWidth(watersprite)/2
+watery = GetVirtualHeight()/2 - GetSpriteHeight(watersprite)
+SetSpritePosition(watersprite, waterx, watery)
+
+// Earth Sprite //
+earthimage = LoadImage("earth.png")
+earthsprite = CreateSprite(earthimage)
+SetSpriteScale(earthsprite, (GetVirtualWidth()/10)/(GetSpriteWidth(earthsprite)), (GetVirtualWidth()/10)/(GetSpriteWidth(earthsprite)))
+earthx = GetVirtualWidth()*3/5 - GetSpriteWidth(earthsprite)/2
+earthy = GetVirtualHeight()/2 - GetSpriteHeight(earthsprite)
+SetSpritePosition(earthsprite, earthx, earthy)
+
+// Air Sprite //
+airimage = LoadImage("air.png")
+airsprite = CreateSprite(airimage)
+SetSpriteScale(airsprite, (GetVirtualWidth()/10)/(GetSpriteWidth(airsprite)), (GetVirtualWidth()/10)/(GetSpriteWidth(airsprite)))
+airx = GetVirtualWidth()*4/5 - GetSpriteWidth(airsprite)/2
+airy = GetVirtualHeight()/2 - GetSpriteHeight(airsprite)
+SetSpritePosition(airsprite, airx, airy)
+
+do
+	// Element Icon Collision Commands //
+	if GetSpriteHitTest(firesprite, GetPointerX(), GetPointerY())
+		if GetPointerPressed() = 1
+			//Element Id 
+		endif
+	endif
+	
+	sync()
 loop
+loop
+
+// Color Shifting for start screen background //
+startscreenbackgroundcolor:
+	if GetSpriteColorRed(startscreenbackground) >= 255
+		if GetSpriteColorBlue(startscreenbackground) >= 1
+			SetSpriteColorBlue(startscreenbackground, GetSpriteColorBlue(startscreenbackground) - 1)
+		else
+			if GetSpriteColorGreen(startscreenbackground) < 255
+				SetSpriteColorGreen(startscreenbackground, GetSpriteColorGreen(startscreenbackground) + 1)
+			endif
+		endif
+	endif
+	if GetSpriteColorGreen(startscreenbackground) >= 255
+		if GetSpriteColorRed(startscreenbackground) >= 1
+			SetSpriteColorRed(startscreenbackground, GetSpriteColorRed(startscreenbackground) - 1)
+		else
+			if GetSpriteColorBlue(startscreenbackground) < 255
+				SetSpriteColorBlue(startscreenbackground, GetSpriteColorBlue(startscreenbackground) + 1)
+			endif
+		endif
+	endif
+	if GetSpriteColorBlue(startscreenbackground) >= 255
+		if GetSpriteColorGreen(startscreenbackground) >= 1
+			SetSpriteColorGreen(startscreenbackground, GetSpriteColorGreen(startscreenbackground) - 1)
+		else
+			if GetSpriteColorRed(startscreenbackground) < 255
+				SetSpriteColorRed(startscreenbackground, GetSpriteColorRed(startscreenbackground) + 1)
+			endif
+		endif
+	endif
+return
+
+// color shifting for title //
+titlecolor:
+	if GetTextColorRed(startscreenbackground) >= 255
+		if GetTextColorBlue(startscreenbackground) >= 1
+			SetTextColorBlue(startscreenbackground, GetTextColorBlue(startscreenbackground) - 1)
+		else
+			if GetTextColorGreen(startscreenbackground) < 255
+				SetTextColorGreen(startscreenbackground, GetTextColorGreen(startscreenbackground) + 1)
+			endif
+		endif
+	endif
+	if GetTextColorGreen(startscreenbackground) >= 255
+		if GetTextColorRed(startscreenbackground) >= 1
+			SetTextColorRed(startscreenbackground, GetTextColorRed(startscreenbackground) - 1)
+		else
+			if GetTextColorBlue(startscreenbackground) < 255
+				SetTextColorBlue(startscreenbackground, GetTextColorBlue(startscreenbackground) + 1)
+			endif
+		endif
+	endif
+	if GetTextColorBlue(startscreenbackground) >= 255
+		if GetTextColorGreen(startscreenbackground) >= 1
+			SetTextColorGreen(startscreenbackground, GetTextColorGreen(startscreenbackground) - 1)
+		else
+			if GetTextColorRed(startscreenbackground) < 255
+				SetTextColorRed(startscreenbackground, GetTextColorRed(startscreenbackground) + 1)
+			endif
+		endif
+	endif
+return
