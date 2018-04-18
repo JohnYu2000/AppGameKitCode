@@ -7,11 +7,11 @@ SetErrorMode(2)
 
 // set window properties
 SetWindowTitle( "Pong" )
-SetWindowSize( 640, 480, 0 )
+SetWindowSize( 900, 650, 0 )
 SetWindowAllowResize( 1 ) // allow the user to resize the window
 
 // set display properties
-SetVirtualResolution( 640, 480 ) // doesn't have to match the window
+SetVirtualResolution( 900, 650 ) // doesn't have to match the window
 SetOrientationAllowed( 1, 1, 1, 1 ) // allow both portrait and landscape on mobile devices
 SetSyncRate( 30, 0 ) // 30fps instead of 60 to save battery
 SetScissor( 0,0,0,0 ) // use the maximum available screen space, no black borders
@@ -35,6 +35,10 @@ https://www.google.ca/search?rlz=1C1CHBF_enCA788CA788&biw=1536&bih=710&tbm=isch&
 // **** To-Do List **** //
 /*
 1. Adjust character selection to suit both players
+2. Come up with a new feature to replace bots
+	- Health Bars
+3. Make opening background nicer (elements wallpaper) 
+4. Add element stat bars for Choose page 
 */
 
 // **** Variables (one time use)**** //
@@ -47,10 +51,17 @@ red = CreateImageColor(255, 0, 0, 255)
 white = CreateImageColor(255, 255, 255, 255)
 grey = CreateImageColor(50, 50, 50, 255)
 black = CreateImageColor(0, 0, 0, 255)
+skyblue = CreateImageColor(0, 191, 255, 255)
 
 //// ******** Code Starts Here ******** ////
 
 // **** Variables (reused after play again) **** //
+elementid1 = 0 // Used to store player 1 choice of element
+elementid2 = 0 // Used to store player 2 choice of element
+fire = 1
+water = 2
+earth = 3
+air = 4
 
 // **** Start Screen Sprites **** //
 
@@ -72,7 +83,7 @@ playtext = CreateText("PLAY")
 SetTextSize(playtext, 50)
 SetTextColor(playtext, 0, 0, 0, 255)
 playtextx = GetVirtualWidth()/2 - GetTextTotalWidth(playtext)/2
-playtexty = GetVirtualHeight()/2 - GetTextTotalHeight(playtext)
+playtexty = GetVirtualHeight()/2 - GetTextTotalHeight(playtext)/2
 SetTextPosition(playtext, playtextx, playtexty)
 
 // Help //
@@ -80,7 +91,7 @@ helptext = CreateText("HELP")
 SetTextSize(helptext, 50)
 SetTextColor(helptext, 0, 0, 0, 255)
 helptextx = GetVirtualWidth()/2 - GetTextTotalWidth(helptext)/2
-helptexty = GetVirtualHeight()/2 
+helptexty = GetVirtualHeight()/2 + GetTextTotalWidth(playtext)/2
 SetTextPosition(helptext, helptextx, helptexty)
 
 // **** Start Screen Code **** //
@@ -89,10 +100,10 @@ do
 	gosub titlecolor
 	
 	// Play Button Commands //
-	if GetTextHitTest(playtext, GetPointerX(), GetPointerY()) = 1
+	if GetTextHitTest(playtext, GetPointerX(), GetPointerY())
 		SetTextSize(playtext, 55)
 		playtextx = GetVirtualWidth()/2 - GetTextTotalWidth(playtext)/2
-		playtexty = GetVirtualHeight()/2 - GetTextTotalHeight(playtext)
+		playtexty = GetVirtualHeight()/2
 		SetTextPosition(playtext, playtextx, playtexty)
 		if GetPointerPressed() = 1
 			sync()
@@ -102,7 +113,7 @@ do
 	else
 		SetTextSize(playtext, 50)
 		playtextx = GetVirtualWidth()/2 - GetTextTotalWidth(playtext)/2
-		playtexty = GetVirtualHeight()/2 - GetTextTotalHeight(playtext)
+		playtexty = GetVirtualHeight()/2
 		SetTextPosition(playtext, playtextx, playtexty)
 	endif
 	
@@ -119,6 +130,13 @@ loop
 charselectback = CreateSprite(black)
 SetSpriteSize(charselectback, GetVirtualWidth(), GetVirtualHeight())
 
+// Choose Your Element //
+choosetext = CreateText("CHOOSE YOUR ELEMENT")
+SetTextSize(choosetext, 50)
+SetTextColor(choosetext, 255, 255, 255, 255)
+choosetextx = GetVirtualWidth()/2 - GetTextTotalWidth(choosetext)/2
+choosetexty = 0
+SetTextPosition(choosetext, choosetextx, choosetexty)
 
 // Fire Sprite //
 fireimage = LoadImage("fire.png")
@@ -131,8 +149,6 @@ SetSpritePosition(firesprite, firex, firey)
 // Water Sprite //
 waterimage = LoadImage("water.png")
 watersprite = CreateSprite(waterimage)
-//SetImageMinFilter(watersprite, 1)
-//SetImageMagFilter(watersprite, 1)
 SetSpriteScale(watersprite, (GetVirtualWidth()/10)/(GetSpriteWidth(watersprite)), (GetVirtualWidth()/10)/(GetSpriteWidth(watersprite)))
 waterx = GetVirtualWidth()*2/5 - GetSpriteWidth(watersprite)/2
 watery = GetVirtualHeight()/2 - GetSpriteHeight(watersprite)
@@ -154,11 +170,82 @@ airx = GetVirtualWidth()*4/5 - GetSpriteWidth(airsprite)/2
 airy = GetVirtualHeight()/2 - GetSpriteHeight(airsprite)
 SetSpritePosition(airsprite, airx, airy)
 
+// Confirm Button //
+confirmtext = CreateText("CONFIRM")
+SetTextDepth(confirmtext, 0)
+SetTextSize(confirmtext, 50)
+SetTextColor(confirmtext, 255, 255, 255, 0)
+confirmtextx = GetVirtualWidth()/2 - GetTextTotalWidth(confirmtext)/2
+confirmtexty = GetVirtualHeight() - GetTextTotalHeight(confirmtext)*2
+SetTextPosition(confirmtext, confirmtextx, confirmtexty)
+
+// Confirm Text Box //
+confirmbox = CreateSprite(skyblue)
+SetSpriteColorAlpha(confirmbox, 0)
+SetSpriteSize(confirmbox, GetTextTotalWidth(confirmtext), GetTextTotalHeight(confirmtext))
+SetSpritePosition(confirmbox, confirmtextx, confirmtexty)
+
+// Player 1 Choice Text //
+player1choicetext = CreateText("Player 1 Chooses ")
+SetTextSize(player1choicetext, 50)
+SetTextColor(player1choicetext, 255, 255, 255, 0)
+player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
+player1choicetexty = GetTextTotalHeight(choosetext)
+SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
+
+// **** Element Selection Code **** //
 do
-	// Element Icon Collision Commands //
+	// ** Element Icon Collision Commands **//
+		// Fire //
 	if GetSpriteHitTest(firesprite, GetPointerX(), GetPointerY())
 		if GetPointerPressed() = 1
-			//Element Id 
+			elementid1 = fire
+			SetTextColorAlpha(confirmtext, 255)
+			SetTextColorAlpha(player1choicetext, 255)
+			SetSpriteColorAlpha(confirmbox, 255)
+			SetTextString(player1choicetext, "Player 1 Chooses Fire")
+			player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
+			player1choicetexty = GetTextTotalHeight(choosetext)
+			SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
+		endif
+	endif
+		// Water //
+	if GetSpriteHitTest(watersprite, GetPointerX(), GetPointerY())
+		if GetPointerPressed() = 1
+			elementid1 = water
+			SetTextColorAlpha(confirmtext, 255)
+			SetTextColorAlpha(player1choicetext, 255)
+			SetSpriteColorAlpha(confirmbox, 255)
+			SetTextString(player1choicetext, "Player 1 Chooses Water")
+			player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
+			player1choicetexty = GetTextTotalHeight(choosetext)
+			SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
+		endif
+	endif
+		// Earth //
+	if GetSpriteHitTest(earthsprite, GetPointerX(), GetPointerY())
+		if GetPointerPressed() = 1
+			elementid1 = earth
+			SetTextColorAlpha(confirmtext, 255)
+			SetTextColorAlpha(player1choicetext, 255)
+			SetSpriteColorAlpha(confirmbox, 255)
+			SetTextString(player1choicetext, "Player 1 Chooses Earth")
+			player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
+			player1choicetexty = GetTextTotalHeight(choosetext)
+			SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
+		endif
+	endif
+		// Air //
+	if GetSpriteHitTest(airsprite, GetPointerX(), GetPointerY())
+		if GetPointerPressed() = 1
+			elementid1 = air
+			SetTextColorAlpha(confirmtext, 255)
+			SetTextColorAlpha(player1choicetext, 255)
+			SetSpriteColorAlpha(confirmbox, 255)
+			SetTextString(player1choicetext, "Player 1 Chooses Air")
+			player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
+			player1choicetexty = GetTextTotalHeight(choosetext)
+			SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
 		endif
 	endif
 	
