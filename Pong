@@ -39,11 +39,13 @@ https://www.google.ca/search?rlz=1C1CHBF_enCA788CA788&biw=1536&bih=710&tbm=isch&
 	- Health Bars
 3. Make opening background nicer (elements wallpaper) 
 4. Add element stat bars for Choose page 
+5. Add Timer in character selection
 */
 
 // **** Variables (one time use)**** //
 
 
+// **** Game Starts Here **** //
 do
 	
 // **** Image Colors **** //
@@ -62,6 +64,10 @@ fire = 1
 water = 2
 earth = 3
 air = 4
+confirmtextalpha = 0
+player1choicetextalpha = 0
+player2choicetextalpha = 0
+confirmboxalpha = 0
 
 // **** Start Screen Sprites **** //
 
@@ -174,35 +180,51 @@ SetSpritePosition(airsprite, airx, airy)
 confirmtext = CreateText("CONFIRM")
 SetTextDepth(confirmtext, 0)
 SetTextSize(confirmtext, 50)
-SetTextColor(confirmtext, 255, 255, 255, 0)
+SetTextColor(confirmtext, 255, 255, 255, confirmtextalpha)
 confirmtextx = GetVirtualWidth()/2 - GetTextTotalWidth(confirmtext)/2
 confirmtexty = GetVirtualHeight() - GetTextTotalHeight(confirmtext)*2
 SetTextPosition(confirmtext, confirmtextx, confirmtexty)
 
-// Confirm Text Box //
+// Confirm Box //
 confirmbox = CreateSprite(skyblue)
-SetSpriteColorAlpha(confirmbox, 0)
-SetSpriteSize(confirmbox, GetTextTotalWidth(confirmtext), GetTextTotalHeight(confirmtext))
+SetSpriteColor(confirmbox, 32, 64, 67, confirmboxalpha)
+confirmboxw = GetTextTotalWidth(confirmtext)
+confirmboxh = GetTextTotalHeight(confirmtext)
+SetSpriteSize(confirmbox, confirmboxw, confirmboxh)
 SetSpritePosition(confirmbox, confirmtextx, confirmtexty)
 
 // Player 1 Choice Text //
 player1choicetext = CreateText("Player 1 Chooses ")
 SetTextSize(player1choicetext, 50)
-SetTextColor(player1choicetext, 255, 255, 255, 0)
+SetTextColor(player1choicetext, 255, 255, 255, player1choicetextalpha)
 player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
 player1choicetexty = GetTextTotalHeight(choosetext)
 SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
 
+// Player 2 Choice Text //
+player2choicetext = CreateText("Player 2 Chooses ")
+SetTextSize(player2choicetext, 50)
+SetTextColor(player2choicetext, 255, 255, 255, player2choicetextalpha)
+player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
+player2choicetexty = GetTextTotalHeight(choosetext)
+SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
+
 // **** Element Selection Code **** //
 do
-	// ** Element Icon Collision Commands **//
+	// Player 1 Choice //
+	do
+	// ** Element Icon Commands **//
+
 		// Fire //
 	if GetSpriteHitTest(firesprite, GetPointerX(), GetPointerY())
 		if GetPointerPressed() = 1
 			elementid1 = fire
-			SetTextColorAlpha(confirmtext, 255)
-			SetTextColorAlpha(player1choicetext, 255)
-			SetSpriteColorAlpha(confirmbox, 255)
+			confirmtextalpha = 255
+			SetTextColorAlpha(confirmtext, confirmtextalpha)
+			player1choicetextalpha = 255
+			SetTextColorAlpha(player1choicetext, player1choicetextalpha)
+			confirmboxalpha = 255
+			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
 			SetTextString(player1choicetext, "Player 1 Chooses Fire")
 			player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
 			player1choicetexty = GetTextTotalHeight(choosetext)
@@ -215,7 +237,8 @@ do
 			elementid1 = water
 			SetTextColorAlpha(confirmtext, 255)
 			SetTextColorAlpha(player1choicetext, 255)
-			SetSpriteColorAlpha(confirmbox, 255)
+			confirmboxalpha = 255
+			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
 			SetTextString(player1choicetext, "Player 1 Chooses Water")
 			player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
 			player1choicetexty = GetTextTotalHeight(choosetext)
@@ -228,7 +251,8 @@ do
 			elementid1 = earth
 			SetTextColorAlpha(confirmtext, 255)
 			SetTextColorAlpha(player1choicetext, 255)
-			SetSpriteColorAlpha(confirmbox, 255)
+			confirmboxalpha = 255
+			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
 			SetTextString(player1choicetext, "Player 1 Chooses Earth")
 			player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
 			player1choicetexty = GetTextTotalHeight(choosetext)
@@ -241,7 +265,8 @@ do
 			elementid1 = air
 			SetTextColorAlpha(confirmtext, 255)
 			SetTextColorAlpha(player1choicetext, 255)
-			SetSpriteColorAlpha(confirmbox, 255)
+			confirmboxalpha = 255
+			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
 			SetTextString(player1choicetext, "Player 1 Chooses Air")
 			player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
 			player1choicetexty = GetTextTotalHeight(choosetext)
@@ -249,8 +274,100 @@ do
 		endif
 	endif
 	
+	// Confirm Button Commands //
+	if GetSpriteHitTest(confirmbox, GetPointerX(), GetPointerY()) = 1
+		SetSpriteColor(confirmbox, 0, 191, 255, confirmboxalpha) // Turn into skyblue
+		if GetPointerPressed() = 1
+			sync()
+			player2select = 1
+			confirmtextalpha = 0
+			SetTextColorAlpha(confirmtext, confirmtextalpha)
+			player1choicetextalpha = 0
+			SetTextColorAlpha(player1choicetext, player1choicetextalpha)
+			confirmboxalpha = 0
+			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
+			exit
+		endif
+	else
+		SetSpriteColor(confirmbox, 32, 64, 67, confirmboxalpha)
+	endif
+	
+	sync()
+	loop
+	
+	// **** Player 2 Choice **** //
+	// Player 2 Choice //
+	do
+			// Fire //
+		if GetSpriteHitTest(firesprite, GetPointerX(), GetPointerY())
+			if GetPointerPressed() = 1
+				elementid2 = fire
+				SetTextColorAlpha(confirmtext, 255)
+				SetTextColorAlpha(player2choicetext, 255)
+				confirmboxalpha = 255
+				SetSpriteColorAlpha(confirmbox, confirmboxalpha)
+				SetTextString(player2choicetext, "Player 2 Chooses Fire")
+				player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
+				player2choicetexty = GetTextTotalHeight(choosetext)
+				SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
+			endif
+		endif
+			// Water //
+		if GetSpriteHitTest(watersprite, GetPointerX(), GetPointerY())
+			if GetPointerPressed() = 1
+				elementid2 = water
+				SetTextColorAlpha(confirmtext, 255)
+				SetTextColorAlpha(player2choicetext, 255)
+				confirmboxalpha = 255
+				SetSpriteColorAlpha(confirmbox, confirmboxalpha)
+				SetTextString(player2choicetext, "Player 2 Chooses Water")
+				player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
+				player2choicetexty = GetTextTotalHeight(choosetext)
+				SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
+			endif
+		endif
+			// Earth //
+		if GetSpriteHitTest(earthsprite, GetPointerX(), GetPointerY())
+			if GetPointerPressed() = 1
+				elementid2 = earth
+				SetTextColorAlpha(confirmtext, 255)
+				SetTextColorAlpha(player2choicetext, 255)
+				confirmboxalpha = 255
+				SetSpriteColorAlpha(confirmbox, confirmboxalpha)
+				SetTextString(player2choicetext, "Player 2 Chooses Earth")
+				player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
+				player2choicetexty = GetTextTotalHeight(choosetext)
+				SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
+			endif
+		endif
+			// Air //
+		if GetSpriteHitTest(airsprite, GetPointerX(), GetPointerY())
+			if GetPointerPressed() = 1
+				elementid2 = air
+				SetTextColorAlpha(confirmtext, 255)
+				SetTextColorAlpha(player2choicetext, 255)
+				confirmboxalpha = 255
+				SetSpriteColorAlpha(confirmbox, confirmboxalpha)
+				SetTextString(player2choicetext, "Player 2 Chooses Air")
+				player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
+				player2choicetexty = GetTextTotalHeight(choosetext)
+				SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
+			endif
+		endif
+		sync()
+		
+	loop
+	
 	sync()
 loop
+
+// Game //
+do
+	Print(elementid1)
+	Print(elementid2)
+	sync()
+loop
+	
 loop
 
 // Color Shifting for start screen background //
