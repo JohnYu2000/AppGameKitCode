@@ -39,7 +39,7 @@ https://www.google.ca/search?rlz=1C1CHBF_enCA788CA788&biw=1536&bih=710&tbm=isch&
 2. Make opening background nicer (elements wallpaper) 
 3. Add element stat bars for Choose page 
 4. Add Timer in character selection
-5. Make ball a combination of two elements chosen (ex: water and earth will use mud ball)
+5. Fix confirm clickability (adjust so that confirm does not work when alpha is 0)
 */
 
 // **** Variables (one time use)**** //
