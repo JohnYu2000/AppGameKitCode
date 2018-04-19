@@ -76,6 +76,14 @@ ballspritespeedy = 15
 ballspritedirx = 1
 ballspritediry = 1
 spritecollidestatus = 0 // To Prevent paddle collision and boundary collision from executing at the same time
+firehp = 4
+firetotalhp = 4
+waterhp = 6
+watertotalhp = 6
+earthhp = 10
+earthtotalhp = 10
+airhp = 6
+airtotalhp = 6
 
 // **** Start Screen Sprites **** //
 
@@ -445,8 +453,10 @@ if elementid2 = 1 then SetSpriteColor(player2hpbarmeter, 255, 0, 0, 255)
 if elementid2 = 2 then SetSpriteColor(player2hpbarmeter, 64, 224, 208, 255)
 if elementid2 = 3 then SetSpriteColor(player2hpbarmeter, 0, 255, 0, 255)
 if elementid2 = 4 then SetSpriteColor(player2hpbarmeter, 255, 255, 255, 255)
+player2hpbarmeterw = GetSpriteWidth(player2hpbarback) - 10
+player2hpbarmeterh = GetSpriteHeight(player2hpbarback) - 10
 SetSpriteSize(player2hpbarmeter, GetSpriteWidth(player2hpbarback) - 10, GetSpriteHeight(player2hpbarback) - 10)
-player2hpbarmeterx = player2hpbarbackx + 5
+player2hpbarmeterx = player2hpbarbackx + GetSpriteWidth(player2hpbarback) - GetSpriteWidth(player2hpbarmeter) - 5
 player2hpbarmetery = player2hpbarbacky + GetSpriteHeight(player2hpbarback)/2 - GetSpriteHeight(player2hpbarmeter)/2
 SetSpritePosition(player2hpbarmeter, player2hpbarmeterx, player2hpbarmetery)
 
@@ -575,6 +585,11 @@ return
 boundarycollision:
 // Right Wall //
 	if ballspritex >= GetVirtualWidth() - GetSpriteWidth(ballsprite) - ballspritespeedx
+		player2hpbarmeterw = player2hpbarmeterw - (GetSpriteWidth(player2hpbarback) - 10)/3
+		SetSpriteSize(player2hpbarmeter, player2hpbarmeterw, player2hpbarmeterh) 
+		player2hpbarmeterx = player2hpbarbackx + GetSpriteWidth(player2hpbarback) - GetSpriteWidth(player2hpbarmeter) - 5
+		player2hpbarmetery = player2hpbarbacky + GetSpriteHeight(player2hpbarback)/2 - GetSpriteHeight(player2hpbarmeter)/2
+		SetSpritePosition(player2hpbarmeter, player2hpbarmeterx, player2hpbarmetery)
 		ballspritedirx = -1		
 	endif
 	
