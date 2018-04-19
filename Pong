@@ -54,6 +54,7 @@ white = CreateImageColor(255, 255, 255, 255)
 grey = CreateImageColor(50, 50, 50, 255)
 black = CreateImageColor(0, 0, 0, 255)
 skyblue = CreateImageColor(0, 191, 255, 255)
+gold = CreateImageColor(255, 215, 0, 255)
 
 //// ******** Code Starts Here ******** ////
 
@@ -407,6 +408,45 @@ ballspritex = GetVirtualWidth()/2 - GetSpriteWidth(ballsprite)/2
 ballspritey = GetVirtualHeight()/2 - GetSpriteHeight(ballsprite)/2
 SetSpritePosition(ballsprite, ballspritex, ballspritey)
 
+// Health Bar //
+	// Player 1 //
+		// Background //
+player1hpbarback = CreateSprite(gold)
+SetSpriteSize(player1hpbarback, GetVirtualWidth()*2/5, 20)
+player1hpbarbackx = GetVirtualWidth()*9/20 - GetSpriteWidth(player1hpbarback)
+player1hpbarbacky = GetVirtualHeight()*1/50
+SetSpritePosition(player1hpbarback, player1hpbarbackx, player1hpbarbacky)
+
+		// Health Meter //
+player1hpbarmeter = CreateSprite(white)
+if elementid1 = 1 then SetSpriteColor(player1hpbarmeter, 255, 0, 0, 255)
+if elementid1 = 2 then SetSpriteColor(player1hpbarmeter, 64, 224, 208, 255)
+if elementid1 = 3 then SetSpriteColor(player1hpbarmeter, 0, 255, 0, 255)
+if elementid1 = 4 then SetSpriteColor(player1hpbarmeter, 255, 255, 255, 255)
+SetSpriteSize(player1hpbarmeter, GetSpriteWidth(player1hpbarback) - 10, GetSpriteHeight(player1hpbarback) - 10)
+player1hpbarmeterx = player1hpbarbackx + GetSpriteWidth(player1hpbarback)/2 - GetSpriteWidth(player1hpbarmeter)/2
+player1hpbarmetery = player1hpbarbacky + GetSpriteHeight(player1hpbarback)/2 - GetSpriteHeight(player1hpbarmeter)/2
+SetSpritePosition(player1hpbarmeter, player1hpbarmeterx, player1hpbarmetery)
+
+	// Player 2 //
+		// Background //
+player2hpbarback = CreateSprite(gold)
+SetSpriteSize(player2hpbarback, GetVirtualWidth()*2/5, 20)
+player2hpbarbackx = GetVirtualWidth()*11/20 
+player2hpbarbacky = GetVirtualHeight()*1/50
+SetSpritePosition(player2hpbarback, player2hpbarbackx, player2hpbarbacky)
+
+		// Health Meter //
+player2hpbarmeter = CreateSprite(white)
+if elementid2 = 1 then SetSpriteColor(player2hpbarmeter, 255, 0, 0, 255)
+if elementid2 = 2 then SetSpriteColor(player2hpbarmeter, 64, 224, 208, 255)
+if elementid2 = 3 then SetSpriteColor(player2hpbarmeter, 0, 255, 0, 255)
+if elementid2 = 4 then SetSpriteColor(player2hpbarmeter, 255, 255, 255, 255)
+SetSpriteSize(player2hpbarmeter, GetSpriteWidth(player2hpbarback) - 10, GetSpriteHeight(player2hpbarback) - 10)
+player2hpbarmeterx = player2hpbarbackx + GetSpriteWidth(player2hpbarback)/2 - GetSpriteWidth(player2hpbarmeter)/2
+player2hpbarmetery = player2hpbarbacky + GetSpriteHeight(player2hpbarback)/2 - GetSpriteHeight(player2hpbarmeter)/2
+SetSpritePosition(player2hpbarmeter, player2hpbarmeterx, player2hpbarmetery)
+
 // **** In-Game **** //
 do		
 	gosub player1movement
@@ -526,18 +566,22 @@ ballmovement:
 return
 
 boundarycollision:
-// Left and Right Walls //
+// Right Wall //
 	if ballspritex >= GetVirtualWidth() - GetSpriteWidth(ballsprite) - ballspritespeedx
 		ballspritedirx = -1
 	endif
+	
+// Left Wall
 	if ballspritex <= 0
 		ballspritedirx = 1
 	endif
 	
-// Top and Bottom Walls //
+// Bottom Wall //
 	if ballspritey >= GetVirtualHeight() - GetSpriteHeight(ballsprite) - ballspritespeedy
 		ballspritediry = -1
 	endif
+	
+// Top Wall //
 	if ballspritey <= 0
 		ballspritediry = 1
 	endif
