@@ -412,8 +412,8 @@ do
 	gosub player1movement
 	gosub player2movement
 	gosub ballmovement
+	gosub spritecollision	
 	gosub boundarycollision
-	gosub spritecollision
 
 	sync()
 loop
