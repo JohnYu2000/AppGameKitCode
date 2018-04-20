@@ -76,14 +76,14 @@ ballspritespeedy = 15
 ballspritedirx = 1
 ballspritediry = 1
 spritecollidestatus = 0 // To Prevent paddle collision and boundary collision from executing at the same time
-firehp = 4
-firetotalhp = 4
-waterhp = 6
-watertotalhp = 6
-earthhp = 10
-earthtotalhp = 10
-airhp = 6
-airtotalhp = 6
+firehp = 400
+waterhp = 600
+earthhp = 1000
+airhp = 600
+player1hp = 600
+player1totalhp = 600
+player2hp = 600
+player2totalhp = 600
 
 // **** Start Screen Sprites **** //
 
@@ -235,6 +235,8 @@ do
 	if GetSpriteHitTest(firesprite, GetPointerX(), GetPointerY())
 	if GetPointerPressed() = 1
 		elementid1 = fire
+		player1totalhp = firehp
+		player1hp = player1totalhp
 		confirmtextalpha = 255
 		SetTextColorAlpha(confirmtext, confirmtextalpha)
 		player1choicetextalpha = 255
@@ -251,6 +253,8 @@ do
 	if GetSpriteHitTest(watersprite, GetPointerX(), GetPointerY())
 	if GetPointerPressed() = 1
 		elementid1 = water
+		player1totalhp = waterhp
+		player1hp = player1totalhp
 		SetTextColorAlpha(confirmtext, 255)
 		SetTextColorAlpha(player1choicetext, 255)
 		confirmboxalpha = 255
@@ -265,6 +269,8 @@ do
 	if GetSpriteHitTest(earthsprite, GetPointerX(), GetPointerY())
 	if GetPointerPressed() = 1
 		elementid1 = earth
+		player1totalhp = earthhp
+		player1hp = player1totalhp
 		SetTextColorAlpha(confirmtext, 255)
 		SetTextColorAlpha(player1choicetext, 255)
 		confirmboxalpha = 255
@@ -279,6 +285,8 @@ do
 	if GetSpriteHitTest(airsprite, GetPointerX(), GetPointerY())
 	if GetPointerPressed() = 1
 		elementid1 = air
+		player1totalhp = airhp
+		player1hp = player1totalhp
 		SetTextColorAlpha(confirmtext, 255)
 		SetTextColorAlpha(player1choicetext, 255)
 		confirmboxalpha = 255
@@ -291,20 +299,22 @@ do
 	endif
 
 	// Confirm Button Commands //
-	if GetSpriteHitTest(confirmbox, GetPointerX(), GetPointerY()) = 1
-	SetSpriteColor(confirmbox, 0, 191, 255, confirmboxalpha) // Turn into skyblue
-	if GetPointerPressed() = 1
-		sync()
-		confirmtextalpha = 0
-		SetTextColorAlpha(confirmtext, confirmtextalpha)
-		player1choicetextalpha = 0
-		SetTextColorAlpha(player1choicetext, player1choicetextalpha)
-		confirmboxalpha = 0
-		SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-		exit
-	endif
-	else
-	SetSpriteColor(confirmbox, 32, 64, 67, confirmboxalpha)
+	if GetSpriteColorAlpha(confirmbox) = 255
+		if GetSpriteHitTest(confirmbox, GetPointerX(), GetPointerY()) = 1
+			SetSpriteColor(confirmbox, 0, 191, 255, confirmboxalpha) // Turn into skyblue
+			if GetPointerPressed() = 1
+				sync()
+				confirmtextalpha = 0
+				SetTextColorAlpha(confirmtext, confirmtextalpha)
+				player1choicetextalpha = 0
+				SetTextColorAlpha(player1choicetext, player1choicetextalpha)
+				confirmboxalpha = 0
+				SetSpriteColorAlpha(confirmbox, confirmboxalpha)
+				exit
+			endif
+		else
+			SetSpriteColor(confirmbox, 32, 64, 67, confirmboxalpha)
+		endif
 	endif
 
 	sync()
@@ -317,6 +327,8 @@ do
 	if GetSpriteHitTest(firesprite, GetPointerX(), GetPointerY())
 		if GetPointerPressed() = 1
 			elementid2 = fire
+			player2totalhp = firehp
+			player2hp = player2totalhp
 			SetTextColorAlpha(confirmtext, 255)
 			SetTextColorAlpha(player2choicetext, 255)
 			confirmboxalpha = 255
@@ -331,6 +343,8 @@ do
 	if GetSpriteHitTest(watersprite, GetPointerX(), GetPointerY())
 		if GetPointerPressed() = 1
 			elementid2 = water
+			player2totalhp = waterhp
+			player2hp = player2totalhp
 			SetTextColorAlpha(confirmtext, 255)
 			SetTextColorAlpha(player2choicetext, 255)
 			confirmboxalpha = 255
@@ -345,6 +359,8 @@ do
 	if GetSpriteHitTest(earthsprite, GetPointerX(), GetPointerY())
 		if GetPointerPressed() = 1
 			elementid2 = earth
+			player2totalhp = earthhp
+			player2hp = player2totalhp
 			SetTextColorAlpha(confirmtext, 255)
 			SetTextColorAlpha(player2choicetext, 255)
 			confirmboxalpha = 255
@@ -359,6 +375,8 @@ do
 	if GetSpriteHitTest(airsprite, GetPointerX(), GetPointerY())
 		if GetPointerPressed() = 1
 			elementid2 = air
+			player2totalhp = airhp
+			player2hp = player2totalhp
 			SetTextColorAlpha(confirmtext, 255)
 			SetTextColorAlpha(player2choicetext, 255)
 			confirmboxalpha = 255
@@ -371,16 +389,18 @@ do
 	endif
 
 	// Confirm Button Commands //
-	if GetSpriteHitTest(confirmbox, GetPointerX(), GetPointerY()) = 1
-		SetSpriteColor(confirmbox, 0, 191, 255, confirmboxalpha) // Turn into skyblue
-		if GetPointerPressed() = 1
-			sync()
-			DeleteAllText()
-			DeleteAllSprites()
-			exit
+	if GetSpriteColorAlpha(confirmbox) = 255
+		if GetSpriteHitTest(confirmbox, GetPointerX(), GetPointerY()) = 1
+			SetSpriteColor(confirmbox, 0, 191, 255, confirmboxalpha) // Turn into skyblue
+			if GetPointerPressed() = 1
+				sync()
+				DeleteAllText()
+				DeleteAllSprites()
+				exit
+			endif
+		else
+			SetSpriteColor(confirmbox, 32, 64, 67, confirmboxalpha)
 		endif
-	else
-		SetSpriteColor(confirmbox, 32, 64, 67, confirmboxalpha)
 	endif
 
 	sync()
@@ -462,6 +482,8 @@ SetSpritePosition(player2hpbarmeter, player2hpbarmeterx, player2hpbarmetery)
 
 // **** In-Game **** //
 do
+	Print(player1hp)
+	Print(player2hp)
 	spritecollidestatus = 0		
 	gosub player1movement
 	gosub player2movement
@@ -470,7 +492,10 @@ do
 	if spritecollidestatus = 0	
 		gosub boundarycollision
 	endif
-
+	// Game Over Commands //
+	if player1hp <= 0 or player2hp <= 0
+		end
+	endif
 
 	sync()
 loop
@@ -584,19 +609,25 @@ return
 
 boundarycollision:
 // Right Wall //
-	if ballspritex >= GetVirtualWidth() - GetSpriteWidth(ballsprite) - ballspritespeedx
-		player2hpbarmeterw = player2hpbarmeterw - (GetSpriteWidth(player2hpbarback) - 10)/3
+	if ballspritex >= GetVirtualWidth() - GetSpriteWidth(ballsprite)
+	// Health //
+		player2hp = player2hp - 200
+		player2hpbarmeterw = (GetSpriteWidth(player2hpbarback) - 10) * player2hp / player2totalhp
 		SetSpriteSize(player2hpbarmeter, player2hpbarmeterw, player2hpbarmeterh) 
 		player2hpbarmeterx = player2hpbarbackx + GetSpriteWidth(player2hpbarback) - GetSpriteWidth(player2hpbarmeter) - 5
 		player2hpbarmetery = player2hpbarbacky + GetSpriteHeight(player2hpbarback)/2 - GetSpriteHeight(player2hpbarmeter)/2
 		SetSpritePosition(player2hpbarmeter, player2hpbarmeterx, player2hpbarmetery)
+	// Direction //
 		ballspritedirx = -1		
 	endif
 	
-// Left Wall
+// Left Wall //
 	if ballspritex <= 0
+	// Direction //
 		ballspritedirx = 1
-		player1hpbarmeterw = player1hpbarmeterw - (GetSpriteWidth(player1hpbarback) - 10)/3
+	// Health //
+		player1hp = player1hp - 200
+		player1hpbarmeterw = (GetSpriteWidth(player1hpbarback) - 10) * player1hp / player1totalhp
 		SetSpriteSize(player1hpbarmeter, player1hpbarmeterw, player1hpbarmeterh)
 	endif
 	
@@ -617,6 +648,7 @@ spritecollision:
 	if GetSpriteCollision(player1sprite, ballsprite) = 1
 		ballspritedirx = 1
 		spritecollidestatus = 1
+	
 	endif
 	
 // Player 2 Sprite and Ball //
