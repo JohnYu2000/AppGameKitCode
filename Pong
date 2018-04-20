@@ -67,9 +67,9 @@ water = 2
 earth = 3
 air = 4
 confirmtextalpha = 0
-player1choicetextalpha = 0
-player2choicetextalpha = 0
 confirmboxalpha = 0
+player1choicetextalpha = 255
+player2choicetextalpha = 0
 player1spritespeed = 20
 player2spritespeed = 20
 ballspritespeedx = 15
@@ -211,8 +211,8 @@ confirmboxh = GetTextTotalHeight(confirmtext)
 SetSpriteSize(confirmbox, confirmboxw, confirmboxh)
 SetSpritePosition(confirmbox, confirmtextx, confirmtexty)
 
-// Player 1 Choice Text //
-player1choicetext = CreateText("Player 1 Chooses ")
+// Player 1 Text //
+player1choicetext = CreateText("Player 1")
 SetTextSize(player1choicetext, 50)
 SetTextColor(player1choicetext, 255, 255, 255, player1choicetextalpha)
 player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
@@ -220,7 +220,7 @@ player1choicetexty = GetTextTotalHeight(choosetext)
 SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
 
 // Player 2 Choice Text //
-player2choicetext = CreateText("Player 2 Chooses ")
+player2choicetext = CreateText("Player 2")
 SetTextSize(player2choicetext, 50)
 SetTextColor(player2choicetext, 255, 255, 255, player2choicetextalpha)
 player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
@@ -241,11 +241,8 @@ do
 		player1hp = player1totalhp
 		confirmtextalpha = 255
 		SetTextColorAlpha(confirmtext, confirmtextalpha)
-		player1choicetextalpha = 255
-		SetTextColorAlpha(player1choicetext, player1choicetextalpha)
 		confirmboxalpha = 255
 		SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-		SetTextString(player1choicetext, "Player 1 Chooses Fire")
 		player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
 		player1choicetexty = GetTextTotalHeight(choosetext)
 		SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
@@ -258,10 +255,8 @@ do
 		player1totalhp = waterhp
 		player1hp = player1totalhp
 		SetTextColorAlpha(confirmtext, 255)
-		SetTextColorAlpha(player1choicetext, 255)
 		confirmboxalpha = 255
 		SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-		SetTextString(player1choicetext, "Player 1 Chooses Water")
 		player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
 		player1choicetexty = GetTextTotalHeight(choosetext)
 		SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
@@ -274,10 +269,8 @@ do
 		player1totalhp = earthhp
 		player1hp = player1totalhp
 		SetTextColorAlpha(confirmtext, 255)
-		SetTextColorAlpha(player1choicetext, 255)
 		confirmboxalpha = 255
 		SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-		SetTextString(player1choicetext, "Player 1 Chooses Earth")
 		player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
 		player1choicetexty = GetTextTotalHeight(choosetext)
 		SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
@@ -290,10 +283,8 @@ do
 		player1totalhp = airhp
 		player1hp = player1totalhp
 		SetTextColorAlpha(confirmtext, 255)
-		SetTextColorAlpha(player1choicetext, 255)
 		confirmboxalpha = 255
 		SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-		SetTextString(player1choicetext, "Player 1 Chooses Air")
 		player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
 		player1choicetexty = GetTextTotalHeight(choosetext)
 		SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
@@ -310,6 +301,8 @@ do
 				SetTextColorAlpha(confirmtext, confirmtextalpha)
 				player1choicetextalpha = 0
 				SetTextColorAlpha(player1choicetext, player1choicetextalpha)
+				player2choicetextalpha = 255
+				SetTextColorAlpha(player2choicetext, player2choicetextalpha)
 				confirmboxalpha = 0
 				SetSpriteColorAlpha(confirmbox, confirmboxalpha)
 				exit
@@ -332,10 +325,8 @@ do
 			player2totalhp = firehp
 			player2hp = player2totalhp
 			SetTextColorAlpha(confirmtext, 255)
-			SetTextColorAlpha(player2choicetext, 255)
 			confirmboxalpha = 255
 			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-			SetTextString(player2choicetext, "Player 2 Chooses Fire")
 			player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
 			player2choicetexty = GetTextTotalHeight(choosetext)
 			SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
@@ -348,10 +339,7 @@ do
 			player2totalhp = waterhp
 			player2hp = player2totalhp
 			SetTextColorAlpha(confirmtext, 255)
-			SetTextColorAlpha(player2choicetext, 255)
 			confirmboxalpha = 255
-			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-			SetTextString(player2choicetext, "Player 2 Chooses Water")
 			player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
 			player2choicetexty = GetTextTotalHeight(choosetext)
 			SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
@@ -364,10 +352,8 @@ do
 			player2totalhp = earthhp
 			player2hp = player2totalhp
 			SetTextColorAlpha(confirmtext, 255)
-			SetTextColorAlpha(player2choicetext, 255)
 			confirmboxalpha = 255
 			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-			SetTextString(player2choicetext, "Player 2 Chooses Earth")
 			player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
 			player2choicetexty = GetTextTotalHeight(choosetext)
 			SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
@@ -380,10 +366,8 @@ do
 			player2totalhp = airhp
 			player2hp = player2totalhp
 			SetTextColorAlpha(confirmtext, 255)
-			SetTextColorAlpha(player2choicetext, 255)
 			confirmboxalpha = 255
 			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-			SetTextString(player2choicetext, "Player 2 Chooses Air")
 			player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
 			player2choicetexty = GetTextTotalHeight(choosetext)
 			SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
