@@ -36,10 +36,11 @@ https://www.google.ca/search?rlz=1C1CHBF_enCA788CA788&biw=1536&bih=710&tbm=isch&
 /*
 1. Come up with a new feature to replace bots
 	- Health Bars
-2. Make opening background nicer (elements wallpaper) 
-3. Add element stat bars for Choose page 
+2. Make opening background nicer (elements wallpaper), all backgrounds
+3. Add element stat bars for Element Selection page 
 4. Add Timer in character selection
-5. Fix confirm clickability (adjust so that confirm does not work when alpha is 0)
+5. In element selection highlight icons instead of Player ... Chooses ... .
+6. Move Element Icons in element selection page close to the top (this allows room for stat bars)
 */
 
 // **** Variables (one time use)**** //
@@ -84,6 +85,7 @@ player1hp = 600
 player1totalhp = 600
 player2hp = 600
 player2totalhp = 600
+winnerid = 0 // Keeps track of who winner is 
 
 // **** Start Screen Sprites **** //
 
@@ -480,7 +482,7 @@ player2hpbarmeterx = player2hpbarbackx + GetSpriteWidth(player2hpbarback) - GetS
 player2hpbarmetery = player2hpbarbacky + GetSpriteHeight(player2hpbarback)/2 - GetSpriteHeight(player2hpbarmeter)/2
 SetSpritePosition(player2hpbarmeter, player2hpbarmeterx, player2hpbarmetery)
 
-// **** In-Game **** //
+// **** In-Game Commands **** //
 do
 	Print(player1hp)
 	Print(player2hp)
@@ -493,15 +495,42 @@ do
 		gosub boundarycollision
 	endif
 	// Game Over Commands //
-	if player1hp <= 0 or player2hp <= 0
-		end
+		// Player 1 is Winner //
+	if player1hp <= 0 
+		winnerid = 2 // "2" represents Player 2
+		exit
+	endif
+	
+		// Player2 is Winner //
+	if player2hp <= 0
+		winnerid = 1 // "1" represents Player 1
+		exit
 	endif
 
 	sync()
 loop
 	
-	sync()
+// **** End Screen **** //
+	// Sprites //
+		// End Screen Background //
+endscreenback = CreateSprite(black)
+SetSpriteSize(endscreenback, GetVirtualWidth(), GetVirtualHeight())
 
+		// Winner Display //
+winnertext = CreateText("insert winner here") // This text will be changed at a later stage
+if winnerid = 1 then SetTextString(winnertext, "Player 1 Wins") // Player 1 Wins
+if winnerid = 2 then SetTextString(winnertext, "Player 2 wins") // player 2 Wins
+SetTextColor(winnertext, 255, 255, 255, 255)
+SetTextSize(winnertext, 50)
+winnertextx = GetVirtualWidth()/2 - GetTextTotalWidth(winnertext)/2
+winnertexty = GetVirtualHeight()/2 - GetTextTotalHeight(winnertext)
+SetTextPosition(winnertext, winnertextx, winnertexty)
+
+	// End Screen Commands //
+do
+	
+	sync()
+loop
 loop
 
 // Color Shifting for start screen background //
@@ -610,7 +639,7 @@ return
 boundarycollision:
 // Right Wall //
 	if ballspritex >= GetVirtualWidth() - GetSpriteWidth(ballsprite)
-	// Health //
+	// Health Bar //
 		player2hp = player2hp - 200
 		player2hpbarmeterw = (GetSpriteWidth(player2hpbarback) - 10) * player2hp / player2totalhp
 		SetSpriteSize(player2hpbarmeter, player2hpbarmeterw, player2hpbarmeterh) 
@@ -625,7 +654,7 @@ boundarycollision:
 	if ballspritex <= 0
 	// Direction //
 		ballspritedirx = 1
-	// Health //
+	// Health Bar //
 		player1hp = player1hp - 200
 		player1hpbarmeterw = (GetSpriteWidth(player1hpbarback) - 10) * player1hp / player1totalhp
 		SetSpriteSize(player1hpbarmeter, player1hpbarmeterw, player1hpbarmeterh)
