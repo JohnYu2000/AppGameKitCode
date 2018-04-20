@@ -46,6 +46,8 @@ https://www.google.ca/search?rlz=1C1CHBF_enCA788CA788&biw=1536&bih=710&tbm=isch&
 	- Notify player who receives ball first
 7. Make ball movement more random
 8. Add different stages of a game so that ball goes faster
+9. Add quotes to end screen
+10. Have the quotes suit the element that won
 */
 
 // **** Variables (one time use)**** //
@@ -58,6 +60,7 @@ do
 // **** Image Colors **** //
 red = CreateImageColor(255, 0, 0, 255)
 white = CreateImageColor(255, 255, 255, 255)
+lightgrey = CreateImageColor(225, 225, 225, 255)
 grey = CreateImageColor(50, 50, 50, 255)
 black = CreateImageColor(0, 0, 0, 255)
 skyblue = CreateImageColor(0, 191, 255, 255)
@@ -82,7 +85,7 @@ ballspritespeedx = 15
 ballspritespeedy = 15
 ballspritedirx = 1
 ballspritediry = 1
-spritecollidestatus = 0 // To Prevent paddle collision and boundary collision from executing at the same time
+spritecollidestatus = 0 // To prevent paddle collision and boundary collision from executing at the same time
 firehp = 400
 waterhp = 600
 earthhp = 1000
@@ -168,7 +171,8 @@ choosetextx = GetVirtualWidth()/2 - GetTextTotalWidth(choosetext)/2
 choosetexty = 0
 SetTextPosition(choosetext, choosetextx, choosetexty)
 
-// Fire Sprite //
+// Element Sprites //
+	// Fire Sprite //
 fireimage = LoadImage("fire.png")
 firesprite = CreateSprite(fireimage)
 SetSpriteScale(firesprite, (GetVirtualWidth()/10)/(GetSpriteWidth(firesprite)), (GetVirtualWidth()/10)/(GetSpriteWidth(firesprite)))
@@ -177,7 +181,7 @@ firey = GetVirtualHeight()/4 - GetSpriteHeight(firesprite)/2
 SetSpritePosition(firesprite, firex, firey)
 SetSpriteDepth(firesprite, 0)
 
-// Water Sprite //
+	// Water Sprite //
 waterimage = LoadImage("water.png")
 watersprite = CreateSprite(waterimage)
 SetSpriteScale(watersprite, (GetVirtualWidth()/10)/(GetSpriteWidth(watersprite)), (GetVirtualWidth()/10)/(GetSpriteWidth(watersprite)))
@@ -186,7 +190,7 @@ watery = GetVirtualHeight()/4 - GetSpriteHeight(watersprite)/2
 SetSpritePosition(watersprite, waterx, watery)
 SetSpriteDepth(watersprite, 0)
 
-// Earth Sprite //
+	// Earth Sprite //
 earthimage = LoadImage("earth.png")
 earthsprite = CreateSprite(earthimage)
 SetSpriteScale(earthsprite, (GetVirtualWidth()/10)/(GetSpriteWidth(earthsprite)), (GetVirtualWidth()/10)/(GetSpriteWidth(earthsprite)))
@@ -195,7 +199,7 @@ earthy = GetVirtualHeight()/4 - GetSpriteHeight(earthsprite)/2
 SetSpritePosition(earthsprite, earthx, earthy)
 SetSpriteDepth(earthsprite, 0)
 
-// Air Sprite //
+	// Air Sprite //
 airimage = LoadImage("air.png")
 airsprite = CreateSprite(airimage)
 SetSpriteScale(airsprite, (GetVirtualWidth()/10)/(GetSpriteWidth(airsprite)), (GetVirtualWidth()/10)/(GetSpriteWidth(airsprite)))
@@ -205,6 +209,7 @@ SetSpritePosition(airsprite, airx, airy)
 SetSpriteDepth(airsprite, 0)
 
 // Confirm Button //
+	// Text
 confirmtext = CreateText("CONFIRM")
 SetTextDepth(confirmtext, 0)
 SetTextSize(confirmtext, 50)
@@ -213,7 +218,7 @@ confirmtextx = GetVirtualWidth()/2 - GetTextTotalWidth(confirmtext)/2
 confirmtexty = GetVirtualHeight() - GetTextTotalHeight(confirmtext)*2
 SetTextPosition(confirmtext, confirmtextx, confirmtexty)
 
-// Confirm Box //
+	// Confirm Box //
 confirmbox = CreateSprite(skyblue)
 SetSpriteColor(confirmbox, 32, 64, 67, confirmboxalpha)
 confirmboxw = GetTextTotalWidth(confirmtext)
@@ -236,6 +241,59 @@ SetTextColor(player2choicetext, 255, 255, 255, player2choicetextalpha)
 player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
 player2choicetexty = GetTextTotalHeight(choosetext)
 SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
+
+// Element Stat // **Displays the stats of the chosen element**
+	// Background //
+elementstatback = CreateSprite(gold)
+SetSpriteSize(elementstatback, GetVirtualWidth(), GetVirtualHeight()/2)
+elementstatbackx = 0
+elementstatbacky = GetVirtualHeight()*7/20
+SetSpritePosition(elementstatback, elementstatbackx, elementstatbacky)
+
+	// Offense Text //
+offensetext = CreateText("OFFENSE")
+SetTextColor(offensetext, 0, 0, 0, 255)
+SetTextSize(offensetext, 50)
+offensetextx = 10
+offensetexty = elementstatbacky + GetSpriteHeight(elementstatback)/6 - GetTextTotalHeight(offensetext)/2
+SetTextPosition(offensetext, offensetextx, offensetexty)
+
+	// Offense stat background //
+offenseback = CreateSprite(lightgrey)
+SetSpriteSize(offenseback, GetVirtualWidth()*3/4, GetTextTotalHeight(offensetext))
+offensebackx = GetVirtualWidth()*9/40
+offensebacky = offensetexty
+SetSpritePosition(offenseback, offensebackx, offensebacky)
+
+	// Defense Text //
+defensetext = CreateText("DEFENSE")
+SetTextColor(defensetext, 0, 0, 0, 255)
+SetTextSize(defensetext, 50)
+defensetextx = 10
+defensetexty = elementstatbacky + GetSpriteHeight(elementstatback)/2 - GetTextTotalHeight(defensetext)/2
+SetTextPosition(defensetext, defensetextx, defensetexty)
+
+	// Defense stat background //
+defenseback = CreateSprite(lightgrey)
+SetSpriteSize(defenseback, GetVirtualWidth()*3/4, GetTextTotalHeight(defensetext))
+defensebackx = GetVirtualWidth()*9/40
+defensebacky = defensetexty
+SetSpritePosition(defenseback, defensebackx, defensebacky)
+
+	// Speed Text //
+speedtext = CreateText("SPEED")
+SetTextColor(speedtext, 0, 0, 0, 255)
+SetTextSize(speedtext, 50)
+speedtextx = 10
+speedtexty = elementstatbacky + GetSpriteHeight(elementstatback)*5/6 - GetTextTotalHeight(defensetext)/2
+SetTextPosition(speedtext, speedtextx, speedtexty)
+
+	// Speed stat background //
+speedback = CreateSprite(lightgrey)
+SetSpriteSize(speedback, GetVirtualWidth()*3/4, GetTextTotalHeight(speedtext))
+speedbackx = GetVirtualWidth()*9/40
+speedbacky = speedtexty
+SetSpritePosition(speedback, speedbackx, speedbacky)
 
 // Element Icon Highlight //
 iconhighlight = CreateSprite(gold)
