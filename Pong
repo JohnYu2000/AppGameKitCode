@@ -439,8 +439,8 @@ SetSpritePosition(player1sprite, player1spritex, player1spritey)
 if elementid1 = 1 
 	fireball1 = LoadImage("fireball1.png")
 	fireball1sprite = CreateSprite(fireball1)
-	fireball1spritex = 200
-	fireball1spritey = 200
+	fireball1spritex = -GetSpriteWidth(fireball1sprite)
+	fireball1spritey = player1spritey + GetSpriteHeight(player1sprite)/2 - GetSpriteHeight(fireball1sprite)/2
 	SetSpritePosition(fireball1sprite, fireball1spritex, fireball1spritey)
 	SetSpriteAnimation(fireball1sprite, 64, 64, 8)
 	SetSpriteColorAlpha(fireball1sprite, 0)
@@ -461,14 +461,14 @@ if elementid1 = 3
 endif
 		// Air Ability Sprite //
 if elementid1 = 4
-	tornado = LoadImage("tornado.png")
-	tornadosprite = CreateSprite(tornado)
-	tornadospritex = 0
-	tornadospritey = 0
-	SetSpritePosition(tornadosprite, tornadospritex, tornadospritey)
-	SetSpriteAnimation(tornadosprite, 350, 600, 2)
-	//SetSpriteScale(tornadosprite, 1/3, 1/3)
-	PlaySprite(tornadosprite, 10, 1, 1, 2)
+	tornado1 = LoadImage("tornado.png")
+	tornadosprite1 = CreateSprite(tornado1)
+	tornadosprite1x = 0
+	tornadosprite1y = 0
+	SetSpritePosition(tornadosprite1, tornadosprite1x, tornadosprite1y)
+	SetSpriteColorAlpha(tornadosprite1, 0)
+	SetSpriteAnimation(tornadosprite1, 350, 600, 2)
+	PlaySprite(tornadosprite1, 7, 1, 1, 2)
 endif
 
 	// Player 2 Paddle //
@@ -483,6 +483,41 @@ player2spritey = 0
 SetSpritePosition(player2sprite, player2spritex, player2spritey)
 
 	// Player 2 Ability Sprite //
+		// Fire Ability Sprite //
+if elementid2 = 1 
+	fireball2 = LoadImage("fireball2.png")
+	fireball2sprite = CreateSprite(fireball2)
+	fireball2spritex = 500
+	fireball2spritey = 200
+	SetSpritePosition(fireball2sprite, fireball2spritex, fireball2spritey)
+	SetSpriteAnimation(fireball2sprite, 64, 64, 8)
+	SetSpriteColorAlpha(fireball2sprite, 0)
+	SetSpriteScale(fireball2sprite, 2, 2)
+	PlaySprite(fireball2sprite, 10, 1, 1, 8)
+endif
+		// Earth Ability Sprite //
+if elementid2 = 3
+	rocks2 = LoadImage("rocks.png")
+	rocksprite2 = CreateSprite(rocks2)
+	rocksprite2x = 500
+	rocksprite2y = 200
+	SetSpritePosition(rocksprite2, rocksprite2x, rocksprite2y)
+	SetSpriteAnimation(rocksprite2, 256, 256, 64)
+	SetSpriteColorAlpha(rocksprite2, 0)
+	SetSpriteScale(rocksprite2, 0.5, 0.5)
+	PlaySprite(rocksprite2, 10, 1, 1, 64)
+endif
+		// Air Ability Sprite //
+if elementid2 = 4
+	tornado2 = LoadImage("tornado.png")
+	tornadosprite2 = CreateSprite(tornado2)
+	tornadosprite2x = 400
+	tornadosprite2y = 0
+	SetSpritePosition(tornadosprite2, tornadosprite2x, tornadosprite2y)
+	SetSpriteColorAlpha(tornadosprite2, 0)
+	SetSpriteAnimation(tornadosprite2, 350, 600, 2)
+	PlaySprite(tornadosprite2, 7, 1, 1, 2)
+endif
 
 	// Ball //
 ballsprite = CreateSprite(white) // Temporary ***************************************************************************************************************
