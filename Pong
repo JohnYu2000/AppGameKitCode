@@ -434,6 +434,43 @@ player1spritex = 0
 player1spritey = 0
 SetSpritePosition(player1sprite, player1spritex, player1spritey)
 
+	// Player 1 Ability Sprite //
+		// Fire Ability Sprite //
+if elementid1 = 1 
+	fireball1 = LoadImage("fireball1.png")
+	fireball1sprite = CreateSprite(fireball1)
+	fireball1spritex = 200
+	fireball1spritey = 200
+	SetSpritePosition(fireball1sprite, fireball1spritex, fireball1spritey)
+	SetSpriteAnimation(fireball1sprite, 64, 64, 8)
+	SetSpriteColorAlpha(fireball1sprite, 0)
+	SetSpriteScale(fireball1sprite, 2, 2)
+	PlaySprite(fireball1sprite, 10, 1, 1, 8)
+endif
+		// Earth Ability Sprite //
+if elementid1 = 3
+	rocks = LoadImage("rocks.png")
+	rocksprite = CreateSprite(rocks)
+	rockspritex = 200
+	rockspritey = 200
+	SetSpritePosition(rocksprite, rockspritex, rockspritey)
+	SetSpriteAnimation(rocksprite, 256, 256, 64)
+	SetSpriteColorAlpha(rocksprite, 0)
+	SetSpriteScale(rocksprite, 0.5, 0.5)
+	PlaySprite(rocksprite, 10, 1, 1, 64)
+endif
+		// Air Ability Sprite //
+if elementid1 = 4
+	tornado = LoadImage("tornado.png")
+	tornadosprite = CreateSprite(tornado)
+	tornadospritex = 0
+	tornadospritey = 0
+	SetSpritePosition(tornadosprite, tornadospritex, tornadospritey)
+	SetSpriteAnimation(tornadosprite, 350, 600, 2)
+	//SetSpriteScale(tornadosprite, 1/3, 1/3)
+	PlaySprite(tornadosprite, 10, 1, 1, 2)
+endif
+
 	// Player 2 Paddle //
 player2sprite = CreateSprite(white)
 if elementid2 = 1 then SetSpriteColor(player2sprite, 255, 0, 0, 255)
@@ -444,6 +481,8 @@ SetSpriteSize(player2sprite, 10, GetVirtualHeight()/5)
 player2spritex = GetVirtualWidth() - GetSpriteWidth(player2sprite)
 player2spritey = 0
 SetSpritePosition(player2sprite, player2spritex, player2spritey)
+
+	// Player 2 Ability Sprite //
 
 	// Ball //
 ballsprite = CreateSprite(white) // Temporary ***************************************************************************************************************
@@ -662,6 +701,8 @@ elementiconcommands1:
 			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
 			// Set the element stat background color //
 			SetSpriteColor(elementstatback, 255, 0, 0, 255)
+			// Set the Active Text String //
+			SetTextString(activetext, "Active: Shoot a Fireball at your enemy")
 			// Set the element meter color //
 				// Offense Meter //
 			SetSpriteColor(offensemeter, 51, 255, 0, 255)
@@ -694,7 +735,7 @@ elementiconcommands1:
 			SetSpriteColorAlpha(iconhighlight, 255)
 			SetSpritePosition(iconhighlight, waterx, watery)
 			// Set the offense meter width //
-			offensemeterw = GetSpriteWidth(offenseback)*6/10 // Water Offense Rating is 6/10
+			offensemeterw = GetSpriteWidth(offenseback)*3/10 // Water Offense Rating is 3/10
 			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
 			// Set the defense meter width //
 			defensemeterw = GetSpriteWidth(defenseback)*8/10 // Water Defense Rating is 8/10
@@ -704,9 +745,11 @@ elementiconcommands1:
 			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
 			// Set the element stat background color //
 			SetSpriteColor(elementstatback, 64, 224, 208, 255)
+			// Set the Active Text String //
+			SetTextString(activetext, "Active: Restore some of your lost health")
 			// Set the element meter color //
 				// Offense Meter //
-			SetSpriteColor(offensemeter, 204, 255, 0, 255)
+			SetSpriteColor(offensemeter, 255, 153, 0, 255)
 				// Defense Meter //
 			SetSpriteColor(defensemeter, 102, 255, 0, 255)
 				// Speed Meter //
@@ -739,18 +782,20 @@ elementiconcommands1:
 			offensemeterw = GetSpriteWidth(offenseback)*7/10 // Earth Offense Rating is 7/10
 			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
 			// Set the defense meter width //
-			defensemeterw = GetSpriteWidth(defenseback)*8/10 // Earth Defense Rating is 8/10
+			defensemeterw = GetSpriteWidth(defenseback)*7/10 // Earth Defense Rating is 7/10
 			SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
 			// Set the speed meter width //
 			speedmeterw = GetSpriteWidth(speedback)*3/10 // Earth Speed Rating is 3/10
 			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
 			// Set the element stat background color //
 			SetSpriteColor(elementstatback, 0, 150, 0, 255)
+			// Set the Active Text String //
+			SetTextString(activetext, "Active: Throw a boulder at your enemy")
 			// Set the element meter color //
 				// Offense Meter //
 			SetSpriteColor(offensemeter, 153, 255, 0, 255)
 				// Defense Meter //
-			SetSpriteColor(defensemeter, 102, 255, 0, 255)
+			SetSpriteColor(defensemeter, 153, 255, 0, 255)
 				// Speed Meter //
 			SetSpriteColor(speedmeter, 255, 153, 0, 255)
 			// Set Text Opacity //
@@ -788,6 +833,8 @@ elementiconcommands1:
 			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
 			// Set the element stat background color//
 			SetSpriteColor(elementstatback, 240, 240, 240, 255)
+			// Set the Active Text String //
+			SetTextString(activetext, "Active: Summon a Tornado")
 			// Set the element meter color //
 				// Offense Meter //
 			SetSpriteColor(offensemeter, 255, 204, 0, 255)
@@ -833,6 +880,8 @@ elementiconcommands2:
 			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
 			// Set the element stat background color //
 			SetSpriteColor(elementstatback, 255, 0, 0, 255)
+			// Set the Active Text String //
+			SetTextString(activetext, "Active: Shoot a Fireball at your enemy")
 			// Set the element meter color //
 				// Offense Meter //
 			SetSpriteColor(offensemeter, 51, 255, 0, 255)
@@ -865,7 +914,7 @@ elementiconcommands2:
 			SetSpriteColorAlpha(iconhighlight, 255)
 			SetSpritePosition(iconhighlight, waterx, watery)
 			// Set the offense meter width //
-			offensemeterw = GetSpriteWidth(offenseback)*6/10 // Water Offense Rating is 6/10
+			offensemeterw = GetSpriteWidth(offenseback)*3/10 // Water Offense Rating is 3/10
 			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
 			// Set the defense meter width //
 			defensemeterw = GetSpriteWidth(defenseback)*8/10 // Water Defense Rating is 8/10
@@ -875,9 +924,11 @@ elementiconcommands2:
 			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
 			// Set the element stat background color //
 			SetSpriteColor(elementstatback, 64, 224, 208, 255)
+			// Set the Active Text String //
+			SetTextString(activetext, "Active: Restore some of your lost health")
 			// Set the element meter color //
 				// Offense Meter //
-			SetSpriteColor(offensemeter, 204, 255, 0, 255)
+			SetSpriteColor(offensemeter, 255, 153, 0, 255)
 				// Defense Meter //
 			SetSpriteColor(defensemeter, 102, 255, 0, 255)
 				// Speed Meter //
@@ -907,21 +958,23 @@ elementiconcommands2:
 			SetSpriteColorAlpha(iconhighlight, 255)
 			SetSpritePosition(iconhighlight, earthx, earthy)
 			// Set the offense meter width //
-			offensemeterw = GetSpriteWidth(offenseback)*7/10 // Earth Offense Rating is 8/10
+			offensemeterw = GetSpriteWidth(offenseback)*7/10 // Earth Offense Rating is 7/10
 			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
 			// Set the defense meter width //
-			defensemeterw = GetSpriteWidth(defenseback)*8/10 // Earth Defense Rating is 8/10
+			defensemeterw = GetSpriteWidth(defenseback)*7/10 // Earth Defense Rating is 7/10
 			SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
 			// Set the speed meter width //
 			speedmeterw = GetSpriteWidth(speedback)*3/10 // Earth Speed Rating is 3/10
 			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
 			// Set the element stat background color //
 			SetSpriteColor(elementstatback, 0, 150, 0, 255)
+			// Set the Active Text String //
+			SetTextString(activetext, "Active: Throw a boulder at your enemy")
 			// Set the element meter color //
 				// Offense Meter //
 			SetSpriteColor(offensemeter, 153, 255, 0, 255)
 				// Defense Meter //
-			SetSpriteColor(defensemeter, 102, 255, 0, 255)
+			SetSpriteColor(defensemeter, 153, 255, 0, 255)
 				// Speed Meter //
 			SetSpriteColor(speedmeter, 255, 153, 0, 255)
 			// Set Text Opacity //
@@ -958,10 +1011,12 @@ elementiconcommands2:
 			speedmeterw = GetSpriteWidth(speedback)*9/10 // Air Speed Rating is 9/10
 			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
 			// Set the element stat background color //
-			SetSpriteColor(elementstatback, 255, 204, 255, 255)
+			SetSpriteColor(elementstatback, 240, 240, 240, 255)
+			// Set the Active Text String //
+			SetTextString(activetext, "Active: Summon a Tornado")
 			// Set the element meter color //
 				// Offense Meter //
-			SetSpriteColor(offensemeter, 255, 51, 0, 255)
+			SetSpriteColor(offensemeter, 255, 204, 0, 255)
 				// Defense Meter //
 			SetSpriteColor(defensemeter, 153, 255, 0, 255)
 				// Speed Meter //
