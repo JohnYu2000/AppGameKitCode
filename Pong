@@ -7,11 +7,11 @@ SetErrorMode(2)
 
 // set window properties
 SetWindowTitle( "Pong" )
-SetWindowSize( 900, 650, 0 )
+SetWindowSize( 900, 600, 0 )
 SetWindowAllowResize( 1 ) // allow the user to resize the window
 
 // set display properties
-SetVirtualResolution( 900, 650 ) // doesn't have to match the window
+SetVirtualResolution( 900, 600 ) // doesn't have to match the window
 SetOrientationAllowed( 1, 1, 1, 1 ) // allow both portrait and landscape on mobile devices
 SetSyncRate( 30, 0 ) // 30fps instead of 60 to save battery
 SetScissor( 0,0,0,0 ) // use the maximum available screen space, no black borders
@@ -65,6 +65,7 @@ grey = CreateImageColor(50, 50, 50, 255)
 black = CreateImageColor(0, 0, 0, 255)
 skyblue = CreateImageColor(0, 191, 255, 255)
 gold = CreateImageColor(255, 215, 0, 255)
+green = CreateImageColor(0, 255, 0, 255)
 
 //// ******** Code Starts Here ******** ////
 
@@ -79,8 +80,12 @@ confirmtextalpha = 0
 confirmboxalpha = 0
 player1choicetextalpha = 255
 player2choicetextalpha = 0
-player1spritespeed = 20
-player2spritespeed = 20
+player1spritespeed = 20 // Default but can change depending on element selection
+player2spritespeed = 20 // Default but can change depending on element selection
+firespeed = 20
+waterspeed = 20
+earthspeed = 9
+airspeed = 40
 ballspritespeedx = 15
 ballspritespeedy = 15
 ballspritedirx = 1
@@ -208,8 +213,9 @@ airy = GetVirtualHeight()/4 - GetSpriteHeight(airsprite)/2
 SetSpritePosition(airsprite, airx, airy)
 SetSpriteDepth(airsprite, 0)
 
-// Confirm Button //
-	// Text
+// Other Sprites //
+	// Confirm Button //
+		// Text
 confirmtext = CreateText("CONFIRM")
 SetTextDepth(confirmtext, 0)
 SetTextSize(confirmtext, 50)
@@ -218,7 +224,7 @@ confirmtextx = GetVirtualWidth()/2 - GetTextTotalWidth(confirmtext)/2
 confirmtexty = GetVirtualHeight() - GetTextTotalHeight(confirmtext)*2
 SetTextPosition(confirmtext, confirmtextx, confirmtexty)
 
-	// Confirm Box //
+		// Confirm Box //
 confirmbox = CreateSprite(skyblue)
 SetSpriteColor(confirmbox, 32, 64, 67, confirmboxalpha)
 confirmboxw = GetTextTotalWidth(confirmtext)
@@ -226,7 +232,7 @@ confirmboxh = GetTextTotalHeight(confirmtext)
 SetSpriteSize(confirmbox, confirmboxw, confirmboxh)
 SetSpritePosition(confirmbox, confirmtextx, confirmtexty)
 
-// Player 1 Text //
+		// Player 1 Text //
 player1choicetext = CreateText("Player 1")
 SetTextSize(player1choicetext, 50)
 SetTextColor(player1choicetext, 255, 255, 255, player1choicetextalpha)
@@ -234,7 +240,7 @@ player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/
 player1choicetexty = GetTextTotalHeight(choosetext)
 SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
 
-// Player 2 Choice Text //
+		// Player 2 Choice Text //
 player2choicetext = CreateText("Player 2")
 SetTextSize(player2choicetext, 50)
 SetTextColor(player2choicetext, 255, 255, 255, player2choicetextalpha)
@@ -244,18 +250,35 @@ SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
 
 // Element Stat // **Displays the stats of the chosen element**
 	// Background //
-elementstatback = CreateSprite(gold)
-SetSpriteSize(elementstatback, GetVirtualWidth(), GetVirtualHeight()/2)
+elementstatback = CreateSprite(white)
+SetSpriteSize(elementstatback, GetVirtualWidth(), GetVirtualHeight()*19/40)
 elementstatbackx = 0
 elementstatbacky = GetVirtualHeight()*7/20
 SetSpritePosition(elementstatback, elementstatbackx, elementstatbacky)
+SetSpriteColorAlpha(elementstatback, 0)
+
+	// Passive Text //
+passivetext = CreateText("PASSIVE:")
+SetTextColor(passivetext, 255, 215, 0, 0)
+SetTextSize(passivetext, 50)
+passivetextx = 10
+passivetexty = elementstatbacky + GetSpriteHeight(elementstatback)/10 - GetTextTotalHeight(passivetext)/2
+SetTextPosition(passivetext, passivetextx, passivetexty)
+
+	// Active Text //
+activetext = CreateText("ACTIVE:")
+SetTextColor(activetext, 255, 215, 0, 0)
+SetTextSize(activetext, 50)
+activetextx = 10
+activetexty = elementstatbacky + GetSpriteHeight(elementstatback)*3/10 - GetTextTotalHeight(activetext)/2
+SetTextPosition(activetext, activetextx, activetexty)
 
 	// Offense Text //
-offensetext = CreateText("OFFENSE")
-SetTextColor(offensetext, 0, 0, 0, 255)
+offensetext = CreateText("OFFENSE:")
+SetTextColor(offensetext, 255, 215, 0, 0)
 SetTextSize(offensetext, 50)
 offensetextx = 10
-offensetexty = elementstatbacky + GetSpriteHeight(elementstatback)/6 - GetTextTotalHeight(offensetext)/2
+offensetexty = elementstatbacky + GetSpriteHeight(elementstatback)/2 - GetTextTotalHeight(offensetext)/2
 SetTextPosition(offensetext, offensetextx, offensetexty)
 
 	// Offense stat background //
@@ -264,13 +287,24 @@ SetSpriteSize(offenseback, GetVirtualWidth()*3/4, GetTextTotalHeight(offensetext
 offensebackx = GetVirtualWidth()*9/40
 offensebacky = offensetexty
 SetSpritePosition(offenseback, offensebackx, offensebacky)
+SetSpriteColorAlpha(offenseback, 0)
+
+	// Offense Meter //
+offensemeter = CreateSprite(white)
+offensemeterw = GetSpriteWidth(offenseback)
+offensemeterh = GetTextTotalHeight(offensetext)
+SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
+offensemeterx = offensebackx
+offensemetery = offensebacky
+SetSpritePosition(offensemeter, offensemeterx, offensemetery)
+SetSpriteColorAlpha(offensemeter, 0)
 
 	// Defense Text //
-defensetext = CreateText("DEFENSE")
-SetTextColor(defensetext, 0, 0, 0, 255)
+defensetext = CreateText("DEFENSE:")
+SetTextColor(defensetext, 255, 215, 0, 0)
 SetTextSize(defensetext, 50)
 defensetextx = 10
-defensetexty = elementstatbacky + GetSpriteHeight(elementstatback)/2 - GetTextTotalHeight(defensetext)/2
+defensetexty = elementstatbacky + GetSpriteHeight(elementstatback)*7/10 - GetTextTotalHeight(defensetext)/2
 SetTextPosition(defensetext, defensetextx, defensetexty)
 
 	// Defense stat background //
@@ -279,13 +313,24 @@ SetSpriteSize(defenseback, GetVirtualWidth()*3/4, GetTextTotalHeight(defensetext
 defensebackx = GetVirtualWidth()*9/40
 defensebacky = defensetexty
 SetSpritePosition(defenseback, defensebackx, defensebacky)
+SetSpriteColorAlpha(defenseback, 0)
+
+	// Defense Meter //
+defensemeter = CreateSprite(white)
+defensemeterw = GetSpriteWidth(defenseback)
+defensemeterh = GetTextTotalHeight(defensetext)
+SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
+defensemeterx = defensebackx
+defensemetery = defensebacky
+SetSpritePosition(defensemeter, defensemeterx, defensemetery)
+SetSpriteColorAlpha(defensemeter, 0)
 
 	// Speed Text //
-speedtext = CreateText("SPEED")
-SetTextColor(speedtext, 0, 0, 0, 255)
+speedtext = CreateText("SPEED:")
+SetTextColor(speedtext, 255, 215, 0, 0)
 SetTextSize(speedtext, 50)
 speedtextx = 10
-speedtexty = elementstatbacky + GetSpriteHeight(elementstatback)*5/6 - GetTextTotalHeight(defensetext)/2
+speedtexty = elementstatbacky + GetSpriteHeight(elementstatback)*9/10 - GetTextTotalHeight(defensetext)/2
 SetTextPosition(speedtext, speedtextx, speedtexty)
 
 	// Speed stat background //
@@ -294,6 +339,17 @@ SetSpriteSize(speedback, GetVirtualWidth()*3/4, GetTextTotalHeight(speedtext))
 speedbackx = GetVirtualWidth()*9/40
 speedbacky = speedtexty
 SetSpritePosition(speedback, speedbackx, speedbacky)
+SetSpriteColorAlpha(speedback, 0)
+
+	// Speed Meter //
+speedmeter = CreateSprite(white)
+speedmeterw = GetSpriteWidth(speedback)
+speedmeterh = GetTextTotalHeight(speedtext)
+SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
+speedmeterx = speedbackx
+speedmetery = speedbacky
+SetSpritePosition(speedmeter, speedmeterx, speedmetery)
+SetSpriteColorAlpha(speedmeter, 0)
 
 // Element Icon Highlight //
 iconhighlight = CreateSprite(gold)
@@ -307,70 +363,178 @@ SetSpritePosition(iconhighlight, 0, 0)
 do
 	// ** Element Icon Commands **//
 
-	// Fire //
+	// Fire 1 //
 	if GetSpriteHitTest(firesprite, GetPointerX(), GetPointerY())
-	if GetPointerPressed() = 1
-		elementid1 = fire
-		player1totalhp = firehp
-		player1hp = player1totalhp
-		confirmtextalpha = 255
-		SetTextColorAlpha(confirmtext, confirmtextalpha)
-		confirmboxalpha = 255
-		SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-		player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
-		player1choicetexty = GetTextTotalHeight(choosetext)
-		SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
-		SetSpriteColorAlpha(iconhighlight, 255)
-		SetSpritePosition(iconhighlight, firex, firey)
+		if GetPointerPressed() = 1
+			elementid1 = fire
+			// Changes the hitpoints //
+			player1totalhp = firehp
+			player1hp = player1totalhp
+			// Make the confirm text appear //
+			confirmtextalpha = 255
+			SetTextColorAlpha(confirmtext, confirmtextalpha)
+			// Make the confirm box appear //
+			confirmboxalpha = 255
+			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
+			// Highlight the element icon chosen //
+			SetSpriteColorAlpha(iconhighlight, 255)
+			SetSpritePosition(iconhighlight, firex, firey)
+			// Set the offense meter width //
+			offensemeterw = GetSpriteWidth(offenseback)*9/10 // Fire Offense Rating is 9/10
+			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
+			// Set the defense meter width //
+			defensemeterw = GetSpriteWidth(defenseback)*2/10 // Fire Defense Rating is 2/10
+			SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
+			// Set the speed meter width //
+			speedmeterw = GetSpriteWidth(speedback)*5/10 // Fire Speed Rating is 5/10
+			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
+			// Set the element stat background color //
+			SetSpriteColor(elementstatback, 255, 0, 0, 255)
+			// Set the element meter color //
+				// Offense Meter //
+			SetSpriteColor(offensemeter, 51, 255, 0, 255)
+				// Defense Meter //
+			SetSpriteColor(defensemeter, 255, 102, 0, 255)
+				// Speed Meter //
+			SetSpriteColor(speedmeter, 255, 255, 0, 255)
+			// Set Text Opacity //
+			SetTextColorAlpha(passivetext, 255)
+			SetTextColorAlpha(activetext, 255)
+			SetTextColorAlpha(offensetext, 255)
+			SetTextColorAlpha(defensetext, 255)
+			SetTextColorAlpha(speedtext, 255)
+			// Changes the speed //
+			player1spritespeed = firespeed
+		endif
 	endif
-	endif
-	// Water //
+	// Water 1 //
 	if GetSpriteHitTest(watersprite, GetPointerX(), GetPointerY())
-	if GetPointerPressed() = 1
-		elementid1 = water
-		player1totalhp = waterhp
-		player1hp = player1totalhp
-		SetTextColorAlpha(confirmtext, 255)
-		confirmboxalpha = 255
-		SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-		player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
-		player1choicetexty = GetTextTotalHeight(choosetext)
-		SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
-		SetSpriteColorAlpha(iconhighlight, 255)
-		SetSpritePosition(iconhighlight, waterx, watery)
+		if GetPointerPressed() = 1
+			// Changes the hitpoints //
+			elementid1 = water
+			player1totalhp = waterhp
+			player1hp = player1totalhp
+			// Make the confirm text appear //
+			SetTextColorAlpha(confirmtext, 255)
+			// Make the confirm box appear //
+			confirmboxalpha = 255
+			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
+			// Highlight the element icon chosen //
+			SetSpriteColorAlpha(iconhighlight, 255)
+			SetSpritePosition(iconhighlight, waterx, watery)
+			// Set the offense meter width //
+			offensemeterw = GetSpriteWidth(offenseback)*6/10 // Water Offense Rating is 6/10
+			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
+			// Set the defense meter width //
+			defensemeterw = GetSpriteWidth(defenseback)*8/10 // Water Defense Rating is 8/10
+			SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
+			// Set the speed meter width //
+			speedmeterw = GetSpriteWidth(speedback)*5/10 // Water Speed Rating is 5/10
+			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
+			// Set the element stat background color //
+			SetSpriteColor(elementstatback, 64, 224, 208, 255)
+			// Set the element meter color //
+				// Offense Meter //
+			SetSpriteColor(offensemeter, 204, 255, 0, 255)
+				// Defense Meter //
+			SetSpriteColor(defensemeter, 102, 255, 0, 255)
+				// Speed Meter //
+			SetSpriteColor(speedmeter, 255, 255, 0, 255)
+			// Set Text Opacity //
+			SetTextColorAlpha(passivetext, 255)
+			SetTextColorAlpha(activetext, 255)
+			SetTextColorAlpha(offensetext, 255)
+			SetTextColorAlpha(defensetext, 255)
+			SetTextColorAlpha(speedtext, 255)
+			// Changes the speed //
+			player1spritespeed = waterspeed
+		endif
 	endif
-	endif
-	// Earth //
+	// Earth 1 //
 	if GetSpriteHitTest(earthsprite, GetPointerX(), GetPointerY())
-	if GetPointerPressed() = 1
-		elementid1 = earth
-		player1totalhp = earthhp
-		player1hp = player1totalhp
-		SetTextColorAlpha(confirmtext, 255)
-		confirmboxalpha = 255
-		SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-		player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
-		player1choicetexty = GetTextTotalHeight(choosetext)
-		SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
-		SetSpriteColorAlpha(iconhighlight, 255)
-		SetSpritePosition(iconhighlight, earthx, earthy)
+		if GetPointerPressed() = 1
+			// Changes the hitpoints //
+			elementid1 = earth
+			player1totalhp = earthhp
+			player1hp = player1totalhp
+			// Make the confirm text appear //
+			SetTextColorAlpha(confirmtext, 255)
+			// Make the confirm box appear //
+			confirmboxalpha = 255
+			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
+			// Highlight the element icon chosen //
+			SetSpriteColorAlpha(iconhighlight, 255)
+			SetSpritePosition(iconhighlight, earthx, earthy)
+			// Set the offense meter width //
+			offensemeterw = GetSpriteWidth(offenseback)*7/10 // Earth Offense Rating is 7/10
+			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
+			// Set the defense meter width //
+			defensemeterw = GetSpriteWidth(defenseback)*8/10 // Earth Defense Rating is 8/10
+			SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
+			// Set the speed meter width //
+			speedmeterw = GetSpriteWidth(speedback)*3/10 // Earth Speed Rating is 3/10
+			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
+			// Set the element stat background color //
+			SetSpriteColor(elementstatback, 0, 150, 0, 255)
+			// Set the element meter color //
+				// Offense Meter //
+			SetSpriteColor(offensemeter, 153, 255, 0, 255)
+				// Defense Meter //
+			SetSpriteColor(defensemeter, 102, 255, 0, 255)
+				// Speed Meter //
+			SetSpriteColor(speedmeter, 255, 153, 0, 255)
+			// Set Text Opacity //
+			SetTextColorAlpha(passivetext, 255)
+			SetTextColorAlpha(activetext, 255)
+			SetTextColorAlpha(offensetext, 255)
+			SetTextColorAlpha(defensetext, 255)
+			SetTextColorAlpha(speedtext, 255)
+			// Changes the speed //
+			player1spritespeed = earthspeed
+		endif
 	endif
-	endif
-	// Air //
+	// Air 1 //
 	if GetSpriteHitTest(airsprite, GetPointerX(), GetPointerY())
-	if GetPointerPressed() = 1
-		elementid1 = air
-		player1totalhp = airhp
-		player1hp = player1totalhp
-		SetTextColorAlpha(confirmtext, 255)
-		confirmboxalpha = 255
-		SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-		player1choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player1choicetext)/2
-		player1choicetexty = GetTextTotalHeight(choosetext)
-		SetTextPosition(player1choicetext, player1choicetextx, player1choicetexty)
-		SetSpriteColorAlpha(iconhighlight, 255)
-		SetSpritePosition(iconhighlight, airx, airy)
-	endif
+		if GetPointerPressed() = 1
+			// Changes the hitpoints //
+			elementid1 = air
+			player1totalhp = airhp
+			player1hp = player1totalhp
+			// Make the confirm text appear //
+			SetTextColorAlpha(confirmtext, 255)
+			// Make the confirm box appear //
+			confirmboxalpha = 255
+			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
+			// Highlight the element icon chosen //
+			SetSpriteColorAlpha(iconhighlight, 255)
+			SetSpritePosition(iconhighlight, airx, airy)
+			// Set the offense meter width //
+			offensemeterw = GetSpriteWidth(offenseback)*1/10 // Air Offense Rating is 1/10
+			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
+			// Set the defense meter width //
+			defensemeterw = GetSpriteWidth(defenseback)*9/10 // Air Defense Rating is 9/10
+			SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
+			// Set the speed meter width //
+			speedmeterw = GetSpriteWidth(speedback)*9/10 // Air Speed Rating is 9/10
+			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
+			// Set the element stat background color//
+			SetSpriteColor(elementstatback, 240, 240, 240, 255)
+			// Set the element meter color //
+				// Offense Meter //
+			SetSpriteColor(offensemeter, 255, 51, 0, 255)
+				// Defense Meter //
+			SetSpriteColor(defensemeter, 51, 255, 0, 255)
+				// Speed Meter //
+			SetSpriteColor(speedmeter, 51, 255, 0, 255)
+			// Set Text Opacity //
+			SetTextColorAlpha(passivetext, 255)
+			SetTextColorAlpha(activetext, 255)
+			SetTextColorAlpha(offensetext, 255)
+			SetTextColorAlpha(defensetext, 255)
+			SetTextColorAlpha(speedtext, 255)
+			// Changes the speed //
+			player1spritespeed = airspeed
+		endif
 	endif
 
 	// Confirm Button Commands //
@@ -379,15 +543,32 @@ do
 			SetSpriteColor(confirmbox, 0, 191, 255, confirmboxalpha) // Turn into skyblue
 			if GetPointerPressed() = 1
 				sync()
+				// Sets the confirm text opacity to 0 //
 				confirmtextalpha = 0
 				SetTextColorAlpha(confirmtext, confirmtextalpha)
 				player1choicetextalpha = 0
+				// Transition the player text between selections //
 				SetTextColorAlpha(player1choicetext, player1choicetextalpha)
 				player2choicetextalpha = 255
 				SetTextColorAlpha(player2choicetext, player2choicetextalpha)
+				// Sets the confirm box opacity to 0 //
 				confirmboxalpha = 0
 				SetSpriteColorAlpha(confirmbox, confirmboxalpha)
 				SetSpriteColorAlpha(iconhighlight, 0)
+				// Set Text Opacity //
+				SetTextColorAlpha(passivetext, 0)
+				SetTextColorAlpha(activetext, 0)
+				SetTextColorAlpha(offensetext, 0)
+				SetTextColorAlpha(defensetext, 0)
+				SetTextColorAlpha(speedtext, 0)
+				// Set Sprite Opacity //
+				SetSpriteColorAlpha(elementstatback, 0)
+				SetSpriteColorAlpha(offenseback, 0)
+				SetSpriteColorAlpha(offensemeter, 0)
+				SetSpriteColorAlpha(defenseback, 0)
+				SetSpriteColorAlpha(defensemeter, 0)
+				SetSpriteColorAlpha(speedback, 0)
+				SetSpriteColorAlpha(speedmeter, 0)
 				exit
 			endif
 		else
@@ -401,68 +582,176 @@ loop
 	// **** Player 2 Choice **** //
 	// Player 2 Choice //
 do
-		// Fire //
+		// Fire 2 //
 	if GetSpriteHitTest(firesprite, GetPointerX(), GetPointerY())
 		if GetPointerPressed() = 1
+			// Changes the hitpoints //
 			elementid2 = fire
 			player2totalhp = firehp
 			player2hp = player2totalhp
+			// Make the confirm text appear //
 			SetTextColorAlpha(confirmtext, 255)
+			// Make the confirm box appear //
 			confirmboxalpha = 255
 			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-			player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
-			player2choicetexty = GetTextTotalHeight(choosetext)
-			SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
+			// Highlight the element icon chosen //
 			SetSpriteColorAlpha(iconhighlight, 255)
 			SetSpritePosition(iconhighlight, firex, firey)
+			// Set the offense meter width //
+			offensemeterw = GetSpriteWidth(offenseback)*9/10 // Fire Offense Rating is 9/10
+			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
+			// Set the defense meter width //
+			defensemeterw = GetSpriteWidth(defenseback)*2/10 // Fire Defense Rating is 2/10
+			SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
+			// Set the speed meter width //
+			speedmeterw = GetSpriteWidth(speedback)*5/10 // Fire Speed Rating is 5/10
+			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
+			// Set the element stat background color //
+			SetSpriteColor(elementstatback, 255, 0, 0, 255)
+			// Set the element meter color //
+				// Offense Meter //
+			SetSpriteColor(offensemeter, 51, 255, 0, 255)
+				// Defense Meter //
+			SetSpriteColor(defensemeter, 255, 102, 0, 255)
+				// Speed Meter //
+			SetSpriteColor(speedmeter, 255, 255, 0, 255)
+			// Set Text Opacity //
+			SetTextColorAlpha(passivetext, 255)
+			SetTextColorAlpha(activetext, 255)
+			SetTextColorAlpha(offensetext, 255)
+			SetTextColorAlpha(defensetext, 255)
+			SetTextColorAlpha(speedtext, 255)
+			// Changes the speed //
+			player2spritespeed = firespeed
 		endif
 	endif
-		// Water //
+		// Water 2 //
 	if GetSpriteHitTest(watersprite, GetPointerX(), GetPointerY())
 		if GetPointerPressed() = 1
+			// Changes the hitpoints //
 			elementid2 = water
 			player2totalhp = waterhp
 			player2hp = player2totalhp
+			// Make the confirm text appear //
 			SetTextColorAlpha(confirmtext, 255)
+			// Make the confirm box appear //
 			confirmboxalpha = 255
 			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-			player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
-			player2choicetexty = GetTextTotalHeight(choosetext)
-			SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
+			// Highlight the element icon chosen //
 			SetSpriteColorAlpha(iconhighlight, 255)
 			SetSpritePosition(iconhighlight, waterx, watery)
+			// Set the offense meter width //
+			offensemeterw = GetSpriteWidth(offenseback)*6/10 // Water Offense Rating is 6/10
+			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
+			// Set the defense meter width //
+			defensemeterw = GetSpriteWidth(defenseback)*8/10 // Water Defense Rating is 8/10
+			SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
+			// Set the speed meter width //
+			speedmeterw = GetSpriteWidth(speedback)*5/10 // Water Speed Rating is 5/10
+			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
+			// Set the element stat background color //
+			SetSpriteColor(elementstatback, 64, 224, 208, 255)
+			// Set the element meter color //
+				// Offense Meter //
+			SetSpriteColor(offensemeter, 204, 255, 0, 255)
+				// Defense Meter //
+			SetSpriteColor(defensemeter, 102, 255, 0, 255)
+				// Speed Meter //
+			SetSpriteColor(speedmeter, 255, 255, 0, 255)
+			// Set Text Opacity //
+			SetTextColorAlpha(passivetext, 255)
+			SetTextColorAlpha(activetext, 255)
+			SetTextColorAlpha(offensetext, 255)
+			SetTextColorAlpha(defensetext, 255)
+			SetTextColorAlpha(speedtext, 255)
+			// Changes the speed //
+			player2spritespeed = waterspeed
 		endif
 	endif
-		// Earth //
+		// Earth 2 //
 	if GetSpriteHitTest(earthsprite, GetPointerX(), GetPointerY())
 		if GetPointerPressed() = 1
+			// Changes the hitpoints //
 			elementid2 = earth
 			player2totalhp = earthhp
 			player2hp = player2totalhp
+			// Make the confirm text appear //
 			SetTextColorAlpha(confirmtext, 255)
+			// Make the confirm box appear //
 			confirmboxalpha = 255
 			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-			player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
-			player2choicetexty = GetTextTotalHeight(choosetext)
-			SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
+			// Highlight the element icon chosen //
 			SetSpriteColorAlpha(iconhighlight, 255)
 			SetSpritePosition(iconhighlight, earthx, earthy)
+			// Set the offense meter width //
+			offensemeterw = GetSpriteWidth(offenseback)*7/10 // Earth Offense Rating is 8/10
+			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
+			// Set the defense meter width //
+			defensemeterw = GetSpriteWidth(defenseback)*8/10 // Earth Defense Rating is 8/10
+			SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
+			// Set the speed meter width //
+			speedmeterw = GetSpriteWidth(speedback)*3/10 // Earth Speed Rating is 3/10
+			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
+			// Set the element stat background color //
+			SetSpriteColor(elementstatback, 0, 150, 0, 255)
+			// Set the element meter color //
+				// Offense Meter //
+			SetSpriteColor(offensemeter, 153, 255, 0, 255)
+				// Defense Meter //
+			SetSpriteColor(defensemeter, 102, 255, 0, 255)
+				// Speed Meter //
+			SetSpriteColor(speedmeter, 255, 153, 0, 255)
+			// Set Text Opacity //
+			SetTextColorAlpha(passivetext, 255)
+			SetTextColorAlpha(activetext, 255)
+			SetTextColorAlpha(offensetext, 255)
+			SetTextColorAlpha(defensetext, 255)
+			SetTextColorAlpha(speedtext, 255)
+			// Changes the speed //
+			player2spritespeed = earthspeed
 		endif
 	endif
-		// Air //
+		// Air 2 //
 	if GetSpriteHitTest(airsprite, GetPointerX(), GetPointerY())
 		if GetPointerPressed() = 1
+			// Changes the hitpoints //
 			elementid2 = air
 			player2totalhp = airhp
 			player2hp = player2totalhp
+			// Make the confirm text appear //
 			SetTextColorAlpha(confirmtext, 255)
+			// Make the confirm box appear //
 			confirmboxalpha = 255
 			SetSpriteColorAlpha(confirmbox, confirmboxalpha)
-			player2choicetextx = GetVirtualWidth()/2 - GetTextTotalWidth(player2choicetext)/2
-			player2choicetexty = GetTextTotalHeight(choosetext)
-			SetTextPosition(player2choicetext, player2choicetextx, player2choicetexty)
+			// Highlight the element icon chosen //
 			SetSpriteColorAlpha(iconhighlight, 255)
 			SetSpritePosition(iconhighlight, airx, airy)
+			// Set the offense meter width //
+			offensemeterw = GetSpriteWidth(offenseback)*1/10 // Air Offense Rating is 1/10
+			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
+			// Set the defense meter width //
+			defensemeterw = GetSpriteWidth(defenseback)*9/10 // Air Defense Rating is 9/10
+			SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
+			// Set the speed meter width //
+			speedmeterw = GetSpriteWidth(speedback)*9/10 // Air Speed Rating is 9/10
+			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
+			// Set the element stat background color //
+			SetSpriteColor(elementstatback, 255, 255, 255, 255)
+			// Set the element meter color //
+				// Offense Meter //
+			SetSpriteColor(offensemeter, 255, 51, 0, 255)
+				// Defense Meter //
+			SetSpriteColor(defensemeter, 51, 255, 0, 255)
+				// Speed Meter //
+			SetSpriteColor(speedmeter, 51, 255, 0, 255)
+			// Set Text Opacity //
+			SetTextColorAlpha(passivetext, 255)
+			SetTextColorAlpha(activetext, 255)
+			SetTextColorAlpha(offensetext, 255)
+			SetTextColorAlpha(defensetext, 255)
+			SetTextColorAlpha(speedtext, 255)
+			// Changes the speed //
+			player2spritespeed = airspeed
 		endif
 	endif
 
@@ -486,7 +775,7 @@ do
 loop
 
 // **** In-Game Sprites **** //
-// Player 1 Paddle //
+	// Player 1 Paddle //
 player1sprite = CreateSprite(white)
 if elementid1 = 1 then SetSpriteColor(player1sprite, 255, 0, 0, 255)
 if elementid1 = 2 then SetSpriteColor(player1sprite, 64, 224, 208, 255)
@@ -497,7 +786,7 @@ player1spritex = 0
 player1spritey = 0
 SetSpritePosition(player1sprite, player1spritex, player1spritey)
 
-// Player 2 Paddle //
+	// Player 2 Paddle //
 player2sprite = CreateSprite(white)
 if elementid2 = 1 then SetSpriteColor(player2sprite, 255, 0, 0, 255)
 if elementid2 = 2 then SetSpriteColor(player2sprite, 64, 224, 208, 255)
@@ -508,23 +797,23 @@ player2spritex = GetVirtualWidth() - GetSpriteWidth(player2sprite)
 player2spritey = 0
 SetSpritePosition(player2sprite, player2spritex, player2spritey)
 
-// Ball //
+	// Ball //
 ballsprite = CreateSprite(white) // Temporary ***************************************************************************************************************
 SetSpriteSize(ballsprite, 30, 30)
 ballspritex = GetVirtualWidth()/2 - GetSpriteWidth(ballsprite)/2
 ballspritey = GetVirtualHeight()/2 - GetSpriteHeight(ballsprite)/2
 SetSpritePosition(ballsprite, ballspritex, ballspritey)
 
-// Health Bar //
-	// Player 1 //
-		// Background //
+	// Health Bar //
+		// Player 1 //
+			// Background //
 player1hpbarback = CreateSprite(gold)
 SetSpriteSize(player1hpbarback, GetVirtualWidth()*2/5, 20)
 player1hpbarbackx = GetVirtualWidth()*9/20 - GetSpriteWidth(player1hpbarback)
 player1hpbarbacky = GetVirtualHeight()*1/50
 SetSpritePosition(player1hpbarback, player1hpbarbackx, player1hpbarbacky)
 
-		// Health Meter //
+			// Health Meter //
 player1hpbarmeter = CreateSprite(white)
 if elementid1 = 1 then SetSpriteColor(player1hpbarmeter, 255, 0, 0, 255)
 if elementid1 = 2 then SetSpriteColor(player1hpbarmeter, 64, 224, 208, 255)
@@ -537,8 +826,8 @@ player1hpbarmeterx = player1hpbarbackx + 5
 player1hpbarmetery = player1hpbarbacky + GetSpriteHeight(player1hpbarback)/2 - GetSpriteHeight(player1hpbarmeter)/2
 SetSpritePosition(player1hpbarmeter, player1hpbarmeterx, player1hpbarmetery)
 
-	// Player 2 //
-		// Background //
+		// Player 2 //
+			// Background //
 player2hpbarback = CreateSprite(gold)
 SetSpriteSize(player2hpbarback, GetVirtualWidth()*2/5, 20)
 player2hpbarbackx = GetVirtualWidth()*11/20 
@@ -699,13 +988,13 @@ return
 
 player1movement:
 	if GetRawKeyState(87) = 1 // "w" key
-		if player1spritey >= player1spritespeed
+		if player1spritey >= 0
 			player1spritey = player1spritey - player1spritespeed
 			SetSpritePosition(player1sprite, player1spritex, player1spritey)
 		endif
 	endif
 	if GetRawKeyState(83) = 1 // "s" key
-		if player1spritey <= GetVirtualHeight() - GetSpriteHeight(player1sprite) - player1spritespeed
+		if player1spritey <= GetVirtualHeight() - GetSpriteHeight(player1sprite) 
 			player1spritey = player1spritey + player1spritespeed
 			SetSpritePosition(player1sprite, player1spritex, player1spritey)
 		endif
@@ -714,13 +1003,13 @@ return
 
 player2movement:
 	if GetRawKeyState(38) = 1 // Up key
-		if player2spritey >= player2spritespeed
+		if player2spritey >= 0
 			player2spritey = player2spritey - player2spritespeed
 			SetSpritePosition(player2sprite, player2spritex, player2spritey)
 		endif
 	endif
 	if GetRawKeyState(40) = 1 // Down Key
-		if player2spritey <= GetVirtualHeight() - GetSpriteHeight(player2sprite) - player2spritespeed
+		if player2spritey <= GetVirtualHeight() - GetSpriteHeight(player2sprite) 
 			player2spritey = player2spritey + player2spritespeed
 			SetSpritePosition(player2sprite, player2spritex, player2spritey)
 		endif
