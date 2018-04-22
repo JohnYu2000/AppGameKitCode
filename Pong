@@ -20,17 +20,12 @@ UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
 // **** To-Do List **** //
 /*
 1. Make opening background nicer (elements wallpaper), all backgrounds
-2. Add Timer in character selection
-3. Make health bars display hp number as well
-4. Make start fairer for player who receives ball first
+2. Make start fairer for player who receives ball first
 	- Ball starts on one end rather than middle
 	- Add Countdown 
 	- Notify player who receives ball first
-5. Make ball movement more random
-6. Add different stages of a game so that ball goes faster
-7. Add quotes to end screen
-8. Have the quotes suit the element that won
-9. Ability Cooldowns
+3. Make ball movement more random
+4. Add different stages of the game
 */
 
 // **** Variables (one time use)**** //
@@ -71,8 +66,8 @@ firespeed = 20
 waterspeed = 20
 earthspeed = 9
 airspeed = 40
-ballspritespeedx = 15
-ballspritespeedy = 15
+ballspritespeedx = Random(10, 15) // Initially slow but gets faster as the game goes on
+ballspritespeedy = Random(5, 10)
 ballspritedirx = 1
 ballspritediry = 1
 spritecollidestatus = 0 // To prevent paddle collision and boundary collision from executing at the same time
@@ -105,6 +100,13 @@ player2totalcooldown = 0
 player2totalcooldownwidth = 0
 startcounting1 = 0 // Tells the program when to keep track of cooldown times for player 1
 startcounting2 = 0 // Tells the program when to keep track of cooldown times for player 2
+stundurationplayer1 = 0
+airstunplayer1 = 0 // Keeps track of when player 1 and tornado collide
+stundurationplayer2 = 0
+airstunplayer2 = 0 // Keeps track of when player 2 and tornado collide
+timethatgamestartedat = 0 // Keeps when exact time that game has started
+gametime = 0 // The duration that the game has been going on with reference to when it started
+timeuntilnextstage = 0
 
 // **** Start Screen Sprites **** //
 
@@ -412,8 +414,9 @@ do
 	if GetSpriteColorAlpha(confirmbox) = 255
 		if GetSpriteHitTest(confirmbox, GetPointerX(), GetPointerY()) = 1
 			SetSpriteColor(confirmbox, 0, 191, 255, confirmboxalpha) // Turn into skyblue
-			if GetPointerPressed() = 1
+			if GetPointerPressed() = 1				
 				sync()
+				timethatgamestartedat = GetSeconds()
 				DeleteAllText()
 				DeleteAllSprites()
 				exit
@@ -436,7 +439,7 @@ if elementid1 = 3 then SetSpriteColor(player1sprite, 0, 255, 0, 255)
 if elementid1 = 4 then SetSpriteColor(player1sprite, 255, 255, 255, 255)
 SetSpriteSize(player1sprite, 10, GetVirtualHeight()/5)
 player1spritex = 0
-player1spritey = 0
+player1spritey = GetVirtualHeight()/2 - GetSpriteHeight(player1sprite)
 SetSpritePosition(player1sprite, player1spritex, player1spritey)
 
 	// Player 1 Ability Sprite //
@@ -447,7 +450,7 @@ if elementid1 = 1
 	fireability1spritex = -GetSpriteWidth(fireability1sprite)*2
 	fireability1spritey = player1spritey + GetSpriteHeight(player1sprite)/2 - GetSpriteHeight(fireability1sprite)/2
 	SetSpritePosition(fireability1sprite, fireability1spritex, fireability1spritey)
-	SetSpriteAnimation(fireability1sprite, 64, 64, 8)
+	SetSpriteAnimation(fireability1sprite, 64, 14, 8)
 	SetSpriteColorAlpha(fireability1sprite, 0)
 	SetSpriteScale(fireability1sprite, 4, 4)
 	PlaySprite(fireability1sprite, 10, 1, 1, 8)
@@ -459,10 +462,10 @@ if elementid1 = 3
 	earthability1spritex = -GetSpriteWidth(earthability1sprite) - 10
 	earthability1spritey = 200
 	SetSpritePosition(earthability1sprite, earthability1spritex, earthability1spritey)
-	SetSpriteAnimation(earthability1sprite, 256, 256, 64)
+	SetSpriteAnimation(earthability1sprite, 250, 184, 8)
 	SetSpriteColorAlpha(earthability1sprite, 0)
 	SetSpriteScale(earthability1sprite, 0.5, 0.5)
-	PlaySprite(earthability1sprite, 10, 1, 1, 64)
+	PlaySprite(earthability1sprite, 10, 1, 1, 8)
 endif
 		// Air Ability Sprite //
 if elementid1 = 4
@@ -471,6 +474,7 @@ if elementid1 = 4
 	airability1spritex = -GetSpriteWidth(airability1sprite) - 10
 	airability1spritey = 0
 	SetSpritePosition(airability1sprite, airability1spritex, airability1spritey)
+	SetSpriteDepth(airability1sprite, 0)
 	SetSpriteAnimation(airability1sprite, 350, 600, 2)
 	SetSpriteColorAlpha(airability1sprite, 0)
 	PlaySprite(airability1sprite, 7, 1, 1, 2)
@@ -484,7 +488,7 @@ if elementid2 = 3 then SetSpriteColor(player2sprite, 0, 255, 0, 255)
 if elementid2 = 4 then SetSpriteColor(player2sprite, 255, 255, 255, 255)
 SetSpriteSize(player2sprite, 10, GetVirtualHeight()/5)
 player2spritex = GetVirtualWidth() - GetSpriteWidth(player2sprite)
-player2spritey = 0
+player2spritey = GetVirtualHeight()/2 - GetSpriteHeight(player2sprite)/2
 SetSpritePosition(player2sprite, player2spritex, player2spritey)
 
 	// Player 2 Ability Sprite //
@@ -495,7 +499,7 @@ if elementid2 = 1
 	fireability2spritex = GetVirtualWidth() + 10
 	fireability2spritey = 0
 	SetSpritePosition(fireability2sprite, fireability2spritex, fireability2spritey)
-	SetSpriteAnimation(fireability2sprite, 64, 64, 8)
+	SetSpriteAnimation(fireability2sprite, 64, 14, 8)
 	SetSpriteColorAlpha(fireability2sprite, 0)
 	SetSpriteScale(fireability2sprite, 4, 4)
 	PlaySprite(fireability2sprite, 10, 1, 1, 8)
@@ -507,10 +511,10 @@ if elementid2 = 3
 	earthability2spritex = GetVirtualWidth() + 10
 	earthability2spritey = 0
 	SetSpritePosition(earthability2sprite, earthability2spritex, earthability2spritey)
-	SetSpriteAnimation(earthability2sprite, 256, 256, 64)
+	SetSpriteAnimation(earthability2sprite, 250, 184, 8)
 	SetSpriteColorAlpha(earthability2sprite, 0)
 	SetSpriteScale(earthability2sprite, 0.5, 0.5)
-	PlaySprite(earthability2sprite, 10, 1, 1, 64)
+	PlaySprite(earthability2sprite, 10, 1, 1, 8)
 endif
 		// Air Ability Sprite //
 if elementid2 = 4
@@ -519,6 +523,7 @@ if elementid2 = 4
 	airability2spritex = GetVirtualWidth() + 10
 	airability2spritey = 0
 	SetSpritePosition(airability2sprite, airability2spritex, airability2spritey)
+	SetSpriteDepth(airability2sprite, 0)
 	SetSpriteAnimation(airability2sprite, 350, 600, 2)
 	SetSpriteColorAlpha(airability2sprite, 0)
 	PlaySprite(airability2sprite, 7, 1, 1, 2)
@@ -527,7 +532,7 @@ endif
 	// Ball //
 ballsprite = CreateSprite(white) // Temporary ***************************************************************************************************************
 SetSpriteSize(ballsprite, 30, 30)
-ballspritex = GetVirtualWidth()/2 - GetSpriteWidth(ballsprite)/2
+ballspritex = GetVirtualWidth()/8
 ballspritey = GetVirtualHeight()/2 - GetSpriteHeight(ballsprite)/2
 SetSpritePosition(ballsprite, ballspritex, ballspritey)
 
@@ -609,6 +614,14 @@ player2cooldownmeterx = player2cooldownbackx + GetSpriteWidth(player2cooldownbac
 player2cooldownmetery = player2cooldownbacky + GetSpriteHeight(player2cooldownback)/2 - GetSpriteHeight(player2cooldownmeter)/2
 SetSpritePosition(player2cooldownmeter, player2cooldownmeterx, player2cooldownmetery)
 
+			// Stage Countdown //
+timeuntilnextstagetext = CreateText(str(timeuntilnextstage))
+SetTextSize(timeuntilnextstagetext, 60)
+SetTextColor(timeuntilnextstagetext, 255, 255, 255, 255)
+timeuntilnextstagetextx = GetVirtualWidth()/2 - GetTextTotalWidth(timeuntilnextstagetext)/2
+timeuntilnextstagetexty = 10
+SetTextPosition(timeuntilnextstagetext, timeuntilnextstagetextx, timeuntilnextstagetexty)
+
 // **** In-Game Commands **** //
 do
 	Print(player1hp)
@@ -617,6 +630,7 @@ do
 	Print(player1totalcooldown)
 	Print(player2currentcooldown)
 	Print(player2totalcooldown)
+	Print(timethatgamestartedat)
 	spritecollidestatus = 0		
 	gosub player1movement
 	gosub player1abilitycontrols
@@ -633,12 +647,16 @@ do
 		// Player 1 is Winner //
 	if player1hp <= 0 
 		winnerid = 2 // "2" represents Player 2
+		DeleteAllText()
+		deleteallsprites()
 		exit
 	endif
 	
 		// Player2 is Winner //
 	if player2hp <= 0
 		winnerid = 1 // "1" represents Player 1
+		DeleteAllText()
+		DeleteAllSprites()
 		exit
 	endif
 
@@ -1142,14 +1160,46 @@ return
 player1movement:
 	if GetRawKeyState(87) = 1 // "w" key
 		if player1spritey >= 0
-			player1spritey = player1spritey - player1spritespeed
-			SetSpritePosition(player1sprite, player1spritex, player1spritey)
+			if Timer() <= stundurationplayer1 + 1
+				if elementid2 = 1
+					player1spritey = player1spritey - 8
+					SetSpritePosition(player1sprite, player1spritex, player1spritey)
+				endif
+				if elementid2 = 3
+					player1spritey = player1spritey 
+					SetSpritePosition(player1sprite, player1spritex, player1spritey)
+				endif
+			else
+				if airstunplayer1 = 1
+					player1spritey = player1spritey 
+					SetSpritePosition(player1sprite, player1spritex, player1spritey)
+				else
+					player1spritey = player1spritey - player1spritespeed
+					SetSpritePosition(player1sprite, player1spritex, player1spritey)
+				endif
+			endif
 		endif
 	endif
 	if GetRawKeyState(83) = 1 // "s" key
-		if player1spritey <= GetVirtualHeight() - GetSpriteHeight(player1sprite) 
-			player1spritey = player1spritey + player1spritespeed
-			SetSpritePosition(player1sprite, player1spritex, player1spritey)
+		if player1spritey <= GetVirtualHeight() - GetSpriteHeight(player1sprite)
+			if Timer() <= stundurationplayer1 + 1
+				if elementid2 = 1
+					player1spritey = player1spritey + 8
+					SetSpritePosition(player1sprite, player1spritex, player1spritey)
+				endif
+				if elementid2 = 3
+					player1spritey = player1spritey 
+					SetSpritePosition(player1sprite, player1spritex, player1spritey)
+				endif
+			else
+				if airstunplayer1 = 1
+					player1spritey = player1spritey 
+					SetSpritePosition(player1sprite, player1spritex, player1spritey)
+				else 
+					player1spritey = player1spritey + player1spritespeed
+					SetSpritePosition(player1sprite, player1spritex, player1spritey)
+				endif
+			endif
 		endif
 	endif
 return
@@ -1181,14 +1231,14 @@ player1abilitycontrols:
 	if elementid1 = 2 
 		if	player1currentcooldown >= player1totalcooldown
 			if GetRawKeyPressed(68) = 1
-				player1hp = player1hp + 50
+				player1hp = player1hp + 100
 				if player1hp >= player1totalhp
 					player1hp = player1totalhp
 				endif
 				player1hpbarmeterw = (GetSpriteWidth(player1hpbarback) - 10) * player1hp / player1totalhp
 				SetSpriteSize(player1hpbarmeter, player1hpbarmeterw, player1hpbarmeterh)
-				player1totalcooldown = GetSeconds() + 15
-				player1totalcooldownwidth = 15
+				player1totalcooldown = GetSeconds() + 25
+				player1totalcooldownwidth = 25
 				player1currentcooldownsave = GetSeconds()
 				startcounting1 = 1
 			endif
@@ -1253,14 +1303,48 @@ return
 player2movement:
 	if GetRawKeyState(38) = 1 // Up key
 		if player2spritey >= 0
-			player2spritey = player2spritey - player2spritespeed
-			SetSpritePosition(player2sprite, player2spritex, player2spritey)
+			if Timer() <= stundurationplayer2 + 1
+				if elementid1 = 1
+					player2spritey = player2spritey - 8
+					SetSpritePosition(player2sprite, player2spritex, player2spritey)
+				endif
+				if elementid1 = 3
+					player2spritey = player2spritey - 0
+					SetSpritePosition(player2sprite, player2spritex, player2spritey)
+				endif
+			else
+				if airstunplayer2 = 1
+					player2spritey = player2spritey 
+					SetSpritePosition(player2sprite, player2spritex, player2spritey)
+				else
+					player2spritey = player2spritey - player2spritespeed
+					SetSpritePosition(player2sprite, player2spritex, player2spritey)
+				endif
+			endif	
 		endif
 	endif
 	if GetRawKeyState(40) = 1 // Down Key
-		if player2spritey <= GetVirtualHeight() - GetSpriteHeight(player2sprite) 
-			player2spritey = player2spritey + player2spritespeed
-			SetSpritePosition(player2sprite, player2spritex, player2spritey)
+		if player2spritey <= GetVirtualHeight() - GetSpriteHeight(player2sprite)
+			if Timer() <= stundurationplayer2 + 1
+				// If hit by fireability1sprite //
+				if elementid1 = 1
+					player2spritey = player2spritey + 8
+					SetSpritePosition(player2sprite, player2spritex, player2spritey)
+				endif
+				// If hit by earthability1sprite //
+				if elementid1 = 3
+					player2spritey = player2spritey + 0
+					SetSpritePosition(player2sprite, player2spritex, player2spritey)
+				endif
+			else
+				if airstunplayer2 = 1
+					player2spritey = player2spritey - 0
+					SetSpritePosition(player2sprite, player2spritex, player2spritey)
+				else
+					player2spritey = player2spritey + player2spritespeed
+					SetSpritePosition(player2sprite, player2spritex, player2spritey)
+				endif
+			endif
 		endif
 	endif
 return
@@ -1295,7 +1379,7 @@ player2abilitycontrols:
 	if elementid2 = 2 
 		if player2currentcooldown >= player2totalcooldown
 			if GetRawKeyPressed(37) = 1
-				player2hp = player2hp + 50
+				player2hp = player2hp + 100
 				if player2hp >= player2totalhp
 					player2hp = player2totalhp
 				endif
@@ -1303,8 +1387,8 @@ player2abilitycontrols:
 				SetSpriteSize(player2hpbarmeter, player2hpbarmeterw, player2hpbarmeterh) 
 				player2hpbarmeterx = player2hpbarbackx + GetSpriteWidth(player2hpbarback) - GetSpriteWidth(player2hpbarmeter) - 5
 				SetSpritePosition(player2hpbarmeter, player2hpbarmeterx, player2hpbarmetery)
-				player2totalcooldown = GetSeconds() + 15
-				player2totalcooldownwidth = 15
+				player2totalcooldown = GetSeconds() + 25
+				player2totalcooldownwidth = 25
 				player2currentcooldownsave = GetSeconds()		
 				startcounting2 = 1
 			endif
@@ -1367,13 +1451,81 @@ return
 
 ballmovement:
 // Horizontal Movement //
-	ballspritex = ballspritex + ballspritedirx*ballspritespeedx
-	
+	ballspritex = ballspritex + ballspritedirx*ballspritespeedx	
 // Vertical Movement //
-	ballspritey = ballspritey + ballspritediry*ballspritespeedy
-	
+	ballspritey = ballspritey + ballspritediry*ballspritespeedy	
 	SetSpritePosition(ballsprite, ballspritex, ballspritey)
-
+// ballspeed //
+	gametime = GetSeconds()
+	runthroughonce1 = 0
+	runthroughonce2 = 0
+	runthroughonce3 = 0
+	runthroughonce4 = 0
+	// Stage 1 //
+	if gametime >= timethatgamestartedat + 5
+		if runthroughonce1 = 0 
+			ballspritespeedx = Random(15, 20)
+			ballspritespeedy = Random(15, 20)
+			runthroughonce1 = 1
+		endif		
+	endif
+	// Update Timer 1 //
+	if gametime < timethatgamestartedat + 5
+		timeuntilnextstage = timethatgamestartedat - gametime + 5
+		SetTextString(timeuntilnextstagetext, str(timeuntilnextstage))
+		timeuntilnextstagetextx = GetVirtualWidth()/2 - GetTextTotalWidth(timeuntilnextstagetext)/2
+		timeuntilnextstagetexty = 10
+		SetTextPosition(timeuntilnextstagetext, timeuntilnextstagetextx, timeuntilnextstagetexty)
+	endif
+	// Stage 2 //
+	if gametime >= timethatgamestartedat + 10
+		if runthroughonce2 = 0 
+			ballspritespeedx = Random(20, 25)
+			ballspritespeedy = Random(20, 25)
+			runthroughonce2 = 1
+		endif
+	endif
+	// Update Timer 2 //
+	if gametime < timethatgamestartedat + 10 and gametime >= timethatgamestartedat + 5
+		timeuntilnextstage = timethatgamestartedat - gametime + 10
+		SetTextString(timeuntilnextstagetext, str(timeuntilnextstage))
+		timeuntilnextstagetextx = GetVirtualWidth()/2 - GetTextTotalWidth(timeuntilnextstagetext)/2
+		timeuntilnextstagetexty = 10
+		SetTextPosition(timeuntilnextstagetext, timeuntilnextstagetextx, timeuntilnextstagetexty)
+	endif
+	// Stage 3 //
+	if gametime >= timethatgamestartedat + 20
+		if runthroughonce3 = 0 
+			ballspritespeedx = Random(30, 40)
+			ballspritespeedy = Random(30, 40)
+			runthroughonce3 = 1
+		endif			
+	endif
+	// Update Timer 3 //
+	if gametime < timethatgamestartedat + 20 and gametime >= timethatgamestartedat + 10
+		timeuntilnextstage = timethatgamestartedat - gametime + 20
+		SetTextString(timeuntilnextstagetext, str(timeuntilnextstage))
+		timeuntilnextstagetextx = GetVirtualWidth()/2 - GetTextTotalWidth(timeuntilnextstagetext)/2
+		timeuntilnextstagetexty = 10
+		SetTextPosition(timeuntilnextstagetext, timeuntilnextstagetextx, timeuntilnextstagetexty)
+	endif
+	// Stage 4 //
+	if gametime >= timethatgamestartedat + 40
+		if runthroughonce4 = 0 
+			ballspritespeedx = Random(50, 60)
+			ballspritespeedy = Random(50, 60)
+			runthroughonce4 = 1			
+		endif
+		DeleteText(timeuntilnextstagetext)			
+	endif
+	// Update Timer 4 //
+	if gametime < timethatgamestartedat + 40 and gametime >= timethatgamestartedat + 20
+		timeuntilnextstage = timethatgamestartedat - gametime + 40
+		SetTextString(timeuntilnextstagetext, str(timeuntilnextstage))
+		timeuntilnextstagetextx = GetVirtualWidth()/2 - GetTextTotalWidth(timeuntilnextstagetext)/2
+		timeuntilnextstagetexty = 10
+		SetTextPosition(timeuntilnextstagetext, timeuntilnextstagetextx, timeuntilnextstagetexty)
+	endif
 return
 
 boundarycollision:
@@ -1394,6 +1546,13 @@ boundarycollision:
 		if fireability1spritex >= GetVirtualWidth()
 			fireabilitystatus1 = 0
 			SetSpriteColorAlpha(fireability1sprite, 0)
+			// Set the Health of Player 2 //
+			player2hp = player2hp - 10
+			player2hpbarmeterw = (GetSpriteWidth(player2hpbarback) - 10) * player2hp / player2totalhp
+			SetSpriteSize(player2hpbarmeter, player2hpbarmeterw, player2hpbarmeterh) 
+			player2hpbarmeterx = player2hpbarbackx + GetSpriteWidth(player2hpbarback) - GetSpriteWidth(player2hpbarmeter) - 5
+			player2hpbarmetery = player2hpbarbacky + GetSpriteHeight(player2hpbarback)/2 - GetSpriteHeight(player2hpbarmeter)/2
+			SetSpritePosition(player2hpbarmeter, player2hpbarmeterx, player2hpbarmetery)
 		endif
 	endif
 	// Earth Ability 1 //
@@ -1425,6 +1584,10 @@ boundarycollision:
 		if fireability2spritex <= -GetSpriteWidth(fireability2sprite)
 			fireabilitystatus2 = 0
 			SetSpriteColorAlpha(fireability2sprite, 0)
+			// Set the Health of Player 2 //
+			player1hp = player1hp - 10
+			player1hpbarmeterw = (GetSpriteWidth(player1hpbarback) - 10) * player1hp / player1totalhp
+			SetSpriteSize(player1hpbarmeter, player1hpbarmeterw, player1hpbarmeterh) 
 		endif
 	endif
 	// Earth Ability 2 //
@@ -1458,8 +1621,7 @@ spritecollision:
 // Player 1 Sprite and Ball //
 	if GetSpriteCollision(player1sprite, ballsprite) = 1
 		ballspritedirx = 1
-		spritecollidestatus = 1
-	
+		spritecollidestatus = 1	
 	endif
 	
 // Player 2 Sprite and Ball //
@@ -1467,12 +1629,168 @@ spritecollision:
 		ballspritedirx = -1
 		spritecollidestatus = 1
 	endif
-// fireability1sprite and player2 collide //
-	//if GetSpriteCollision(fireability1sprite, player2sprite)
-		
-	//endif
-
+// Player 1 Sprite collides with Player 2 Sprite //
+	// fireability1sprite and player2 collide //
+	if elementid1 = 1
+		if GetSpriteCollision(fireability1sprite, player2sprite) = 1
+			if GetSpriteColorAlpha(fireability1sprite) = 255
+				if fireabilitystatus1 = 1
+					SetSpriteColorAlpha(fireability1sprite, 0)
+					fireabilitystatus1 = 0
+					// If hit the cooldown is reduced to 3 seconds //
+					player1totalcooldown = player1totalcooldown - 7
+					player1totalcooldownwidth = 3
+					// Set the Health of Player 2 //
+					player2hp = player2hp - 50
+					player2hpbarmeterw = (GetSpriteWidth(player2hpbarback) - 10) * player2hp / player2totalhp
+					SetSpriteSize(player2hpbarmeter, player2hpbarmeterw, player2hpbarmeterh) 
+					player2hpbarmeterx = player2hpbarbackx + GetSpriteWidth(player2hpbarback) - GetSpriteWidth(player2hpbarmeter) - 5
+					player2hpbarmetery = player2hpbarbacky + GetSpriteHeight(player2hpbarback)/2 - GetSpriteHeight(player2hpbarmeter)/2
+					SetSpritePosition(player2hpbarmeter, player2hpbarmeterx, player2hpbarmetery)
+					// If hit player 2 is stunned //
+					stundurationplayer2 = Timer() 
+				endif
+			endif
+		endif
+	endif
+	// earthability1sprite and player2collide //
+	if elementid1 = 3
+		if GetSpriteCollision(earthability1sprite, player2sprite) = 1
+			if GetSpriteColorAlpha(earthability1sprite) = 255
+				if earthabilitystatus1 = 1
+					earthabilitystatus1 = 0
+					SetSpriteColorAlpha(earthability1sprite, 0)
+					// If hit player 2 is stunned //
+					stundurationplayer2 = Timer()					
+				endif
+			endif
+		endif
+	endif
+	// earthability1sprite and pong ball collide //
+	if elementid1 = 3
+		if GetSpriteCollision(earthability1sprite, ballsprite) = 1
+			if ballspritedirx = -1 
+				ballspritedirx = 1
+			endif
+		endif
+	endif
+	// airability1sprite and player2collide //
+	if elementid1 = 4
+		if GetSpriteCollision(airability1sprite, player2sprite) = 1
+			if GetSpriteColorAlpha(airability1sprite) = 255
+				airstunplayer2 = 1
+			endif
+		else
+			airstunplayer2 = 0
+		endif
+	endif
+	// airability1sprite and player2sprite //
+		// air and fire //
+	if elementid1 = 4 and elementid2 = 1
+		if GetSpriteCollision(airability1sprite, fireability2sprite) = 1
+			fireabilitystatus2 = 0
+			SetSpriteColorAlpha(fireability2sprite, 0)
+		endif
+	endif
+		// air and earth //
+	if elementid1 = 4 and elementid2 = 3
+		if GetSpriteCollision(airability1sprite, earthability2sprite) = 1
+			earthabilitystatus2 = 0
+			SetSpriteColorAlpha(earthability2sprite, 0)
+		endif
+	endif
+		// air and air //
+	if elementid1 = 4 and elementid2 = 4 
+		if GetSpriteColorAlpha(airability2sprite) = 255 and GetSpriteColorAlpha(airability1sprite) = 255
+			if GetSpriteCollision(airability1sprite, airability2sprite) = 1
+				airabilitystatus1 = 0
+				SetSpriteColorAlpha(airability1sprite, 0)
+				airabilitystatus2 = 0
+				SetSpriteColorAlpha(airability2sprite, 0)
+			endif
+		endif
+	endif
+	
+// Player 2 Sprite collides with Player 1 Sprite //
+	// fireability2sprite and player1 collide //
+	if elementid2 = 1
+		if GetSpriteCollision(fireability2sprite, player1sprite) = 1
+			if GetSpriteColorAlpha(fireability2sprite) = 255
+				if fireabilitystatus2 = 1
+					SetSpriteColorAlpha(fireability2sprite, 0)
+					fireabilitystatus2 = 0
+					// If hit the cooldown is reduced to 3 seconds //
+					player2totalcooldown = player2totalcooldown - 7
+					player2totalcooldownwidth = 3
+					// Set the Health of Player 1 //
+					player1hp = player1hp - 50
+					player1hpbarmeterw = (GetSpriteWidth(player1hpbarback) - 10) * player1hp / player1totalhp
+					SetSpriteSize(player1hpbarmeter, player1hpbarmeterw, player1hpbarmeterh) 
+					// If hit player 1 is stunned //
+					stundurationplayer1 = Timer() 
+				endif
+			endif
+		endif
+	endif
+	// earthability2sprite and player1collide //
+	if elementid2 = 3
+		if GetSpriteCollision(earthability2sprite, player1sprite) = 1
+			if GetSpriteColorAlpha(earthability2sprite) = 255
+				if earthabilitystatus2 = 1
+					earthabilitystatus2 = 0
+					SetSpriteColorAlpha(earthability2sprite, 0)
+					// If hit player 1 is stunned //
+					stundurationplayer1 = Timer()					
+				endif
+			endif
+		endif
+	endif
+	// earthability2sprite and pong ball collide //
+	if elementid2 = 3
+		if GetSpriteCollision(earthability2sprite, ballsprite) = 1
+			if ballspritedirx = 1 
+				ballspritedirx = -1
+			endif
+		endif
+	endif
+	// airability2sprite and player1collide //
+	if elementid2 = 4
+		if GetSpriteCollision(airability2sprite, player1sprite) = 1
+			if GetSpriteColorAlpha(airability2sprite) = 255
+				airstunplayer1 = 1
+			endif
+		else
+			airstunplayer1 = 0
+		endif
+	endif
+	// airability2sprite and player1sprite //
+		// air and fire //
+	if elementid2 = 4 and elementid1 = 1
+		if GetSpriteCollision(airability2sprite, fireability1sprite) = 1
+			fireabilitystatus1 = 0
+			SetSpriteColorAlpha(fireability1sprite, 0)
+		endif
+	endif
+		// air and earth //
+	if elementid2 = 4 and elementid1 = 3
+		if GetSpriteCollision(airability2sprite, earthability1sprite) = 1
+			earthabilitystatus1 = 0
+			SetSpriteColorAlpha(earthability1sprite, 0)
+		endif
+	endif
+		// air and air //
+	if elementid2 = 4 and elementid1 = 4
+		if GetSpriteColorAlpha(airability1sprite) = 255 and GetSpriteColorAlpha(airability2sprite) = 255
+			if GetSpriteCollision(airability2sprite, airability1sprite) = 1
+				airabilitystatus1 = 0
+				SetSpriteColorAlpha(airability1sprite, 0)
+				airabilitystatus2 = 0
+				SetSpriteColorAlpha(airability2sprite, 0)
+			endif
+		endif
+	endif	
 return
+
 
 player1cooldownbarcommands:
 	if startcounting1 = 0 
@@ -1505,7 +1823,7 @@ player2cooldownbarcommands:
 	endif
 	player2cooldownmeterw = (GetSpriteWidth(player2cooldownback) - 10)*player2currentcooldownwidth/player2totalcooldownwidth
 	SetSpriteSize(player2cooldownmeter, player2cooldownmeterw, player2cooldownmeterh)
-	player2cooldownmeterx = player2cooldownbackx + 5
+	player2cooldownmeterx = player2cooldownbackx + GetSpriteWidth(player2cooldownback) - GetSpriteWidth(player2cooldownmeter) - 5
 	player2cooldownmetery = player2cooldownbacky + GetSpriteHeight(player2cooldownback)/2 - GetSpriteHeight(player2cooldownmeter)/2
 	SetSpritePosition(player2cooldownmeter, player2cooldownmeterx, player2cooldownmetery)
 return
