@@ -19,17 +19,13 @@ UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
 
 // **** To-Do List **** //
 /*
-1. Make opening background nicer (elements wallpaper), all backgrounds
-2. Make start fairer for player who receives ball first
-	- Ball starts on one end rather than middle
-	- Add Countdown 
-	- Notify player who receives ball first
-3. Make ball movement more random
-4. Add different stages of the game
+1. Add a second page in tutorial outlining what each ability does
 */
 
-// **** Variables (one time use)**** //
-
+// Variables (One Time Use) //
+titlecolorred = 255
+titlecolorgreen = 0
+titlecolorblue = 0
 
 // **** Game Starts Here **** //
 // Main Menu Loop Starts Here //
@@ -63,7 +59,7 @@ player2choicetextalpha = 0
 player1spritespeed = 20 // Default but can change depending on element selection
 player2spritespeed = 20 // Default but can change depending on element selection
 firespeed = 20
-waterspeed = 20
+waterspeed = 25
 earthspeed = 9
 airspeed = 40
 ballspritespeedx = Random(10, 15) // Initially slow but gets faster as the game goes on
@@ -111,14 +107,13 @@ timeuntilnextstage = 0
 // **** Start Screen Sprites **** //
 
 // Start Screen Background //
-startscreenbackground = CreateSprite(white)
+startscreenbackground = CreateSprite(LoadImage("risingsun.png"))
 SetSpriteSize(startscreenbackground, GetVirtualWidth(), GetVirtualHeight())
-SetSpriteColor(startscreenbackground, 255, 0, 0, 255)
 
 // Title //
 pongtext = CreateText("Elemental-Pong")
-SetTextSize(pongtext, 50)
-SetTextColor(pongtext, 0, 255, 0, 255)
+SetTextSize(pongtext, 100)
+SetTextColor(pongtext, titlecolorred, titlecolorgreen, titlecolorblue, 255)
 pongtextx = GetVirtualWidth()/2 - GetTextTotalWidth(pongtext)/2
 pongtexty = 0
 SetTextPosition(pongtext, pongtextx, pongtexty)
@@ -128,7 +123,7 @@ playtext = CreateText("PLAY")
 SetTextSize(playtext, 50)
 SetTextColor(playtext, 0, 0, 0, 255)
 playtextx = GetVirtualWidth()/2 - GetTextTotalWidth(playtext)/2
-playtexty = GetVirtualHeight()/2 - GetTextTotalHeight(playtext)/2
+playtexty = GetVirtualHeight()*2/5 - GetTextTotalHeight(playtext)
 SetTextPosition(playtext, playtextx, playtexty)
 
 // Tutorial Button //
@@ -136,29 +131,174 @@ tutorialtext = CreateText("?")
 SetTextSize(tutorialtext, 50)
 SetTextColor(tutorialtext, 0, 255, 100, 255)
 tutorialtextx = GetVirtualWidth()/2 - GetTextTotalWidth(tutorialtext)/2
-tutorialtexty = GetVirtualHeight()/2 + GetTextTotalWidth(playtext)/2
+tutorialtexty = GetVirtualHeight()*13/20
 SetTextPosition(tutorialtext, tutorialtextx, tutorialtexty)
+
+// Tutorial Background //
+tutorialback = CreateSprite(LoadImage("scroll.png"))
+SetSpriteSize(tutorialback, GetVirtualWidth(), GetVirtualHeight())
+SetSpriteColorAlpha(tutorialback, 0)
+SetSpriteDepth(tutorialback, 1)
+
+// Back Button //
+backtext = CreateText("BACK")
+SetTextSize(backtext, 50)
+SetTextColorAlpha(backtext, 0)
+SetTextDepth(backtext, 0)
+backtextx = GetVirtualWidth()/2 - GetTextTotalWidth(backtext)/2
+backtexty = GetVirtualHeight()*4/5 - GetTextTotalHeight(backtext)
+SetTextPosition(backtext, backtextx, backtexty)
+
+// Tutorial Text //
+	// Left Page //
+leftpagetitle = CreateText("Controls")
+leftpagetext1 = CreateText("Player 1")
+leftpagetext2 = CreateText("Use W and S to move paddle")
+leftpagetext3 = CreateText("Use D to activate your ability")
+leftpagetext4 = CreateText("Player 2")
+leftpagetext5 = CreateText("Use PgUp and PgDn to move paddle")
+leftpagetext6 = CreateText("Use left arrow key activate your ability")
+
+	// Right Page //
+rightpagetitle = CreateText("Gameplay")
+rightpagetext1 = CreateText("1. Be the last one standing")
+rightpagetext2 = CreateText("2. The Pong is deadly!")
+rightpagetext3 = CreateText("3. Use actives for advantage")
+rightpagetext4 = CreateText("4. Pong moves faster with time")
+rightpagetext5 = CreateText("5. Timer tells when Pong speeds up")
+
+	// Left Page Size //
+SetTextSize(leftpagetitle, 60)
+SetTextSize(leftpagetext1, 40)
+SetTextSize(leftpagetext2, 25)
+SetTextSize(leftpagetext3, 25)
+SetTextSize(leftpagetext4, 40)
+SetTextSize(leftpagetext5, 25)
+SetTextSize(leftpagetext6, 25)
+
+	// Right Page Size //
+SetTextSize(rightpagetitle, 60)
+SetTextSize(rightpagetext1, 25)
+SetTextSize(rightpagetext2, 25)
+SetTextSize(rightpagetext3, 25)
+SetTextSize(rightpagetext4, 25)
+SetTextSize(rightpagetext5, 25)
+
+	// Left Page Position //
+leftpagetitlex = GetVirtualWidth()/4 - GetTextTotalWidth(leftpagetitle)/2
+leftpagetitley = GetVirtualHeight()/10
+SetTextPosition(leftpagetitle, leftpagetitlex, leftpagetitley)
+
+leftpagetext1x = GetVirtualWidth()/4 - GetTextTotalWidth(leftpagetext1)/2
+leftpagetext1y = GetVirtualHeight()/5
+SetTextPosition(leftpagetext1, leftpagetext1x, leftpagetext1y)
+
+leftpagetext2x = GetVirtualWidth()/10
+leftpagetext2y = GetVirtualHeight()*3/10
+SetTextPosition(leftpagetext2, leftpagetext2x, leftpagetext2y)
+
+leftpagetext3x = GetVirtualWidth()/10
+leftpagetext3y = GetVirtualHeight()*7/20
+SetTextPosition(leftpagetext3, leftpagetext3x, leftpagetext3y)
+
+leftpagetext4x = GetVirtualWidth()/4 - GetTextTotalWidth(leftpagetext4)/2
+leftpagetext4y = GetVirtualHeight()/2
+SetTextPosition(leftpagetext4, leftpagetext4x, leftpagetext4y)
+
+leftpagetext5x = GetVirtualWidth()/10
+leftpagetext5y = GetVirtualHeight()*3/5
+SetTextPosition(leftpagetext5, leftpagetext5x, leftpagetext5y)
+
+leftpagetext6x = GetVirtualWidth()/10
+leftpagetext6y = GetVirtualHeight()*13/20
+SetTextPosition(leftpagetext6, leftpagetext6x, leftpagetext6y)
+
+	// Right Page Position //
+rightpagetitlex = GetVirtualWidth()*3/4 - GetTextTotalWidth(rightpagetitle)/2
+rightpagetitley = GetVirtualHeight()/10
+SetTextPosition(rightpagetitle, rightpagetitlex, rightpagetitley)
+
+rightpagetext1x = GetVirtualWidth()*11/20
+rightpagetext1y = GetVirtualHeight()*5/20
+SetTextPosition(rightpagetext1, rightpagetext1x, rightpagetext1y)
+
+rightpagetext2x = GetVirtualWidth()*11/20
+rightpagetext2y = GetVirtualHeight()*7/20
+SetTextPosition(rightpagetext2, rightpagetext2x, rightpagetext2y)
+
+rightpagetext3x = GetVirtualWidth()*11/20
+rightpagetext3y = GetVirtualHeight()*9/20
+SetTextPosition(rightpagetext3, rightpagetext3x, rightpagetext3y)
+
+rightpagetext4x = GetVirtualWidth()*11/20
+rightpagetext4y = GetVirtualHeight()*11/20
+SetTextPosition(rightpagetext4, rightpagetext4x, rightpagetext4y)
+
+rightpagetext5x = GetVirtualWidth()*11/20
+rightpagetext5y = GetVirtualHeight()*13/20
+SetTextPosition(rightpagetext5, rightpagetext5x, rightpagetext5y)
+	
+	// Left Page Color //
+SetTextColorAlpha(leftpagetitle, 0)
+SetTextColorAlpha(leftpagetext1, 0)
+SetTextColorAlpha(leftpagetext2, 0)
+SetTextColorAlpha(leftpagetext3, 0)
+SetTextColorAlpha(leftpagetext4, 0)
+SetTextColorAlpha(leftpagetext5, 0)
+SetTextColorAlpha(leftpagetext6, 0)
+	
+	// Right Page Color //
+SetTextColorAlpha(rightpagetitle, 0)
+SetTextColorAlpha(rightpagetext1, 0)
+SetTextColorAlpha(rightpagetext2, 0)
+SetTextColorAlpha(rightpagetext3, 0)
+SetTextColorAlpha(rightpagetext4, 0)
+SetTextColorAlpha(rightpagetext5, 0)
+	
+	// Left Page Depth //
+SetTextDepth(leftpagetitle, 0)
+SetTextDepth(leftpagetext1, 0)
+SetTextDepth(leftpagetext2, 0)
+SetTextDepth(leftpagetext3, 0)
+SetTextDepth(leftpagetext4, 0)
+SetTextDepth(leftpagetext5, 0)
+SetTextDepth(leftpagetext6, 0)
+	
+	// Right Page Depth //
+SetTextDepth(rightpagetitle, 0)
+SetTextDepth(rightpagetext1, 0)
+SetTextDepth(rightpagetext2, 0)
+SetTextDepth(rightpagetext3, 0)
+SetTextDepth(rightpagetext4, 0)
+SetTextDepth(rightpagetext5, 0)
 
 // **** Start Screen Code **** //
 do
-	gosub startscreenbackgroundcolor
+	//gosub startscreenbackgroundcolor
 	gosub titlecolor
+	gosub tutorialbuttoncommands
+	gosub backbuttoncommands
 	
 	// Play Button Commands //
 	if GetTextHitTest(playtext, GetPointerX(), GetPointerY())
-		SetTextSize(playtext, 55)
-		playtextx = GetVirtualWidth()/2 - GetTextTotalWidth(playtext)/2
-		playtexty = GetVirtualHeight()/2
-		SetTextPosition(playtext, playtextx, playtexty)
-		if GetPointerPressed() = 1
-			sync()
-			DeleteAllText()
-			exit
+		if GetSpriteColorAlpha(tutorialback) = 0
+			SetTextSize(playtext, 55)
+			playtextx = GetVirtualWidth()/2 - GetTextTotalWidth(playtext)/2
+			playtexty = GetVirtualHeight()*2/5
+			SetTextPosition(playtext, playtextx, playtexty)
+			if GetPointerPressed() = 1
+				sync() 
+				titlecolorred = GetTextColorRed(pongtext)
+				titlecolorgreen = GetTextColorGreen(pongtext)
+				titlecolorblue = GetTextColorBlue(pongtext)
+				DeleteAllText()
+				exit
+			endif
 		endif
 	else
 		SetTextSize(playtext, 50)
 		playtextx = GetVirtualWidth()/2 - GetTextTotalWidth(playtext)/2
-		playtexty = GetVirtualHeight()/2
+		playtexty = GetVirtualHeight()*2/5
 		SetTextPosition(playtext, playtextx, playtexty)
 	endif
 	
@@ -172,7 +312,7 @@ loop
 // Sprites //
 
 // Background //
-charselectback = CreateSprite(black)
+charselectback = CreateSprite(LoadImage("fourelements.png"))
 SetSpriteSize(charselectback, GetVirtualWidth(), GetVirtualHeight())
 
 // Choose Your Element //
@@ -431,13 +571,18 @@ do
 loop
 
 // **** In-Game Sprites **** //
+	// Background //
+ingamebackground = CreateSprite(LoadImage("arena.png"))
+SetSpriteSize(ingamebackground, GetVirtualWidth(), GetVirtualHeight())
+SetSpriteDepth(ingamebackground, 10)
+
 	// Player 1 Paddle //
 player1sprite = CreateSprite(white)
 if elementid1 = 1 then SetSpriteColor(player1sprite, 255, 0, 0, 255)
-if elementid1 = 2 then SetSpriteColor(player1sprite, 64, 224, 208, 255)
+if elementid1 = 2 then SetSpriteColor(player1sprite, 0, 42, 255, 255)
 if elementid1 = 3 then SetSpriteColor(player1sprite, 0, 255, 0, 255)
 if elementid1 = 4 then SetSpriteColor(player1sprite, 255, 255, 255, 255)
-SetSpriteSize(player1sprite, 10, GetVirtualHeight()/5)
+SetSpriteSize(player1sprite, 10, GetVirtualHeight()/4)
 player1spritex = 0
 player1spritey = GetVirtualHeight()/2 - GetSpriteHeight(player1sprite)
 SetSpritePosition(player1sprite, player1spritex, player1spritey)
@@ -483,10 +628,10 @@ endif
 	// Player 2 Paddle //
 player2sprite = CreateSprite(white)
 if elementid2 = 1 then SetSpriteColor(player2sprite, 255, 0, 0, 255)
-if elementid2 = 2 then SetSpriteColor(player2sprite, 64, 224, 208, 255)
+if elementid2 = 2 then SetSpriteColor(player2sprite, 0, 42, 255, 255)
 if elementid2 = 3 then SetSpriteColor(player2sprite, 0, 255, 0, 255)
 if elementid2 = 4 then SetSpriteColor(player2sprite, 255, 255, 255, 255)
-SetSpriteSize(player2sprite, 10, GetVirtualHeight()/5)
+SetSpriteSize(player2sprite, 10, GetVirtualHeight()/4)
 player2spritex = GetVirtualWidth() - GetSpriteWidth(player2sprite)
 player2spritey = GetVirtualHeight()/2 - GetSpriteHeight(player2sprite)/2
 SetSpritePosition(player2sprite, player2spritex, player2spritey)
@@ -624,13 +769,6 @@ SetTextPosition(timeuntilnextstagetext, timeuntilnextstagetextx, timeuntilnextst
 
 // **** In-Game Commands **** //
 do
-	Print(player1hp)
-	Print(player2hp)
-	Print(player1currentcooldown)
-	Print(player1totalcooldown)
-	Print(player2currentcooldown)
-	Print(player2totalcooldown)
-	Print(timethatgamestartedat)
 	spritecollidestatus = 0		
 	gosub player1movement
 	gosub player1abilitycontrols
@@ -666,7 +804,7 @@ loop
 // **** End Screen **** //
 	// Sprites //
 		// End Screen Background //
-endscreenback = CreateSprite(black)
+endscreenback = CreateSprite(LoadImage("planetearth.png"))
 SetSpriteSize(endscreenback, GetVirtualWidth(), GetVirtualHeight())
 
 		// Winner Display //
@@ -774,6 +912,76 @@ titlecolor:
 	endif
 return
 
+tutorialbuttoncommands:
+	if GetTextHitTest(tutorialtext, GetPointerX(), GetPointerY())
+		SetTextSize(tutorialtext, 60)
+		tutorialtextx = GetVirtualWidth()/2 - GetTextTotalWidth(tutorialtext)/2
+		tutorialtexty = GetVirtualHeight()*13/20
+		SetTextPosition(tutorialtext, tutorialtextx, tutorialtexty)
+		if GetPointerPressed() = 1
+			sync()
+			SetSpriteColorAlpha(tutorialback, 255)
+			SetTextColorAlpha(backtext, 255)
+						// Left Page Color //
+			SetTextColorAlpha(leftpagetitle, 255)
+			SetTextColorAlpha(leftpagetext1, 255)
+			SetTextColorAlpha(leftpagetext2, 255)
+			SetTextColorAlpha(leftpagetext3, 255)
+			SetTextColorAlpha(leftpagetext4, 255)
+			SetTextColorAlpha(leftpagetext5, 255)
+			SetTextColorAlpha(leftpagetext6, 255)
+				
+				// Right Page Color //
+			SetTextColorAlpha(rightpagetitle, 255)
+			SetTextColorAlpha(rightpagetext1, 255)
+			SetTextColorAlpha(rightpagetext2, 255)
+			SetTextColorAlpha(rightpagetext3, 255)
+			SetTextColorAlpha(rightpagetext4, 255)
+			SetTextColorAlpha(rightpagetext5, 255)
+		endif
+	else
+		SetTextSize(tutorialtext, 50)
+		tutorialtextx = GetVirtualWidth()/2 - GetTextTotalWidth(tutorialtext)/2
+		tutorialtexty = GetVirtualHeight()*13/20
+		SetTextPosition(tutorialtext, tutorialtextx, tutorialtexty)
+	endif
+return
+
+backbuttoncommands:
+	if GetTextHitTest(backtext, GetPointerX(), GetPointerY())
+		SetTextSize(backtext, 55)
+		backtextx = GetVirtualWidth()/2 - GetTextTotalWidth(backtext)/2
+		backtexty = GetVirtualHeight()*4/5 - GetTextTotalHeight(backtext)
+		SetTextPosition(backtext, backtextx, backtexty)
+		if GetPointerPressed() = 1
+			sync()
+			SetSpriteColorAlpha(tutorialback, 0)
+			SetTextColorAlpha(backtext, 0)
+						// Left Page Color //
+			SetTextColorAlpha(leftpagetitle, 0)
+			SetTextColorAlpha(leftpagetext1, 0)
+			SetTextColorAlpha(leftpagetext2, 0)
+			SetTextColorAlpha(leftpagetext3, 0)
+			SetTextColorAlpha(leftpagetext4, 0)
+			SetTextColorAlpha(leftpagetext5, 0)
+			SetTextColorAlpha(leftpagetext6, 0)
+				
+				// Right Page Color //
+			SetTextColorAlpha(rightpagetitle, 0)
+			SetTextColorAlpha(rightpagetext1, 0)
+			SetTextColorAlpha(rightpagetext2, 0)
+			SetTextColorAlpha(rightpagetext3, 0)
+			SetTextColorAlpha(rightpagetext4, 0)
+			SetTextColorAlpha(rightpagetext5, 0)
+		endif
+	else
+		SetTextSize(backtext, 50)
+		backtextx = GetVirtualWidth()/2 - GetTextTotalWidth(backtext)/2
+		backtexty = GetVirtualHeight()*4/5 - GetTextTotalHeight(backtext)
+		SetTextPosition(backtext, backtextx, backtexty)
+	endif
+return
+
 elementiconcommands1:
 // Fire 1 //
 	if GetSpriteHitTest(firesprite, GetPointerX(), GetPointerY())
@@ -839,25 +1047,25 @@ elementiconcommands1:
 			SetSpriteColorAlpha(iconhighlight, 255)
 			SetSpritePosition(iconhighlight, waterx, watery)
 			// Set the offense meter width //
-			offensemeterw = GetSpriteWidth(offenseback)*3/10 // Water Offense Rating is 3/10
+			offensemeterw = GetSpriteWidth(offenseback)*1/10 // Water Offense Rating is 1/10
 			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
 			// Set the defense meter width //
 			defensemeterw = GetSpriteWidth(defenseback)*8/10 // Water Defense Rating is 8/10
 			SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
 			// Set the speed meter width //
-			speedmeterw = GetSpriteWidth(speedback)*5/10 // Water Speed Rating is 5/10
+			speedmeterw = GetSpriteWidth(speedback)*7/10 // Water Speed Rating is 7/10
 			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
 			// Set the element stat background color //
-			SetSpriteColor(elementstatback, 64, 224, 208, 255)
+			SetSpriteColor(elementstatback, 0, 42, 255, 255)
 			// Set the Active Text String //
 			SetTextString(activetext, "Active: Restore some of your lost health")
 			// Set the element meter color //
 				// Offense Meter //
-			SetSpriteColor(offensemeter, 255, 153, 0, 255)
+			SetSpriteColor(offensemeter, 255, 51, 0, 255)
 				// Defense Meter //
 			SetSpriteColor(defensemeter, 102, 255, 0, 255)
 				// Speed Meter //
-			SetSpriteColor(speedmeter, 255, 255, 0, 255)
+			SetSpriteColor(speedmeter, 153, 255, 0, 255)
 			// Set Text Opacity //
 			SetTextColorAlpha(activetext, 255)
 			SetTextColorAlpha(offensetext, 255)
@@ -1030,25 +1238,25 @@ elementiconcommands2:
 			SetSpriteColorAlpha(iconhighlight, 255)
 			SetSpritePosition(iconhighlight, waterx, watery)
 			// Set the offense meter width //
-			offensemeterw = GetSpriteWidth(offenseback)*3/10 // Water Offense Rating is 3/10
+			offensemeterw = GetSpriteWidth(offenseback)*1/10 // Water Offense Rating is 1/10
 			SetSpriteSize(offensemeter, offensemeterw, offensemeterh)
 			// Set the defense meter width //
 			defensemeterw = GetSpriteWidth(defenseback)*8/10 // Water Defense Rating is 8/10
 			SetSpriteSize(defensemeter, defensemeterw, defensemeterh)
 			// Set the speed meter width //
-			speedmeterw = GetSpriteWidth(speedback)*5/10 // Water Speed Rating is 5/10
+			speedmeterw = GetSpriteWidth(speedback)*7/10 // Water Speed Rating is 7/10
 			SetSpriteSize(speedmeter, speedmeterw, speedmeterh)
 			// Set the element stat background color //
-			SetSpriteColor(elementstatback, 64, 224, 208, 255)
+			SetSpriteColor(elementstatback, 0, 42, 255, 255)
 			// Set the Active Text String //
 			SetTextString(activetext, "Active: Restore some of your lost health")
 			// Set the element meter color //
 				// Offense Meter //
-			SetSpriteColor(offensemeter, 255, 153, 0, 255)
+			SetSpriteColor(offensemeter, 255, 51, 0, 255)
 				// Defense Meter //
 			SetSpriteColor(defensemeter, 102, 255, 0, 255)
 				// Speed Meter //
-			SetSpriteColor(speedmeter, 255, 255, 0, 255)
+			SetSpriteColor(speedmeter, 153, 255, 0, 255)
 			// Set Text Opacity //
 			SetTextColorAlpha(activetext, 255)
 			SetTextColorAlpha(offensetext, 255)
@@ -1237,8 +1445,8 @@ player1abilitycontrols:
 				endif
 				player1hpbarmeterw = (GetSpriteWidth(player1hpbarback) - 10) * player1hp / player1totalhp
 				SetSpriteSize(player1hpbarmeter, player1hpbarmeterw, player1hpbarmeterh)
-				player1totalcooldown = GetSeconds() + 25
-				player1totalcooldownwidth = 25
+				player1totalcooldown = GetSeconds() + 20
+				player1totalcooldownwidth = 20
 				player1currentcooldownsave = GetSeconds()
 				startcounting1 = 1
 			endif
@@ -1387,8 +1595,8 @@ player2abilitycontrols:
 				SetSpriteSize(player2hpbarmeter, player2hpbarmeterw, player2hpbarmeterh) 
 				player2hpbarmeterx = player2hpbarbackx + GetSpriteWidth(player2hpbarback) - GetSpriteWidth(player2hpbarmeter) - 5
 				SetSpritePosition(player2hpbarmeter, player2hpbarmeterx, player2hpbarmetery)
-				player2totalcooldown = GetSeconds() + 25
-				player2totalcooldownwidth = 25
+				player2totalcooldown = GetSeconds() + 20
+				player2totalcooldownwidth = 20
 				player2currentcooldownsave = GetSeconds()		
 				startcounting2 = 1
 			endif
