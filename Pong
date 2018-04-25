@@ -17,6 +17,20 @@ SetSyncRate( 30, 0 ) // 30fps instead of 60 to save battery
 SetScissor( 0,0,0,0 ) // use the maximum available screen space, no black borders
 UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
 
+/*
+	Abilities:
+		Fire: When the fireball hits the enemy the enemy is slowed to speed 8 for 1 second and 
+the enemy takes 50 damage. The fireball cooldown is also reduced from 10 seconds to 3 second. If
+the fireball misses the cooldown is 10 seconds and the enemy take 10 damage.
+		Water: This heals your paddle for 100 health and has a cooldown of 20 seconds. 
+		Earth: Throws a boulder. When the boulder hits the enemy the enemy is stunned (cannot move)
+for 1 second. The boulder can also reflect the pong ball. This ability has a cooldown of 1 seconds.
+		Air: Summons a Tornado. The tornado moves across the screen and stops any enemy fireball
+or boulder. This is like Janna's tornado and Yasuo's Windwall combined. When the tornado and enemy 
+sprite collide the enemy is immobile while in the tornado. When two tornado's collide both simply 
+cancel eachother out and reset their positions. This ability has a cooldown of 10 seconds. 
+*/
+
 // **** To-Do List **** //
 /*
 1. Add a second page in tutorial outlining what each ability does
