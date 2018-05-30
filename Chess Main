@@ -1,0 +1,1707 @@
+// Project: Chess
+// Author: John Yu 
+// Created: 2018-05-01
+
+// show all errors
+SetErrorMode(2)
+
+// set window properties
+SetWindowTitle( "Chess" )
+SetWindowSize( 800, 800, 0 )
+SetWindowAllowResize( 1 ) // allow the user to resize the window
+
+// set display properties
+SetVirtualResolution( 800, 800 ) // doesn't have to match the window
+SetOrientationAllowed( 1, 1, 1, 1 ) // allow both portrait and landscape on mobile devices
+SetSyncRate( 30, 0 ) // 30fps instead of 60 to save battery
+SetScissor( 0,0,0,0 ) // use the maximum available screen space, no black borders
+UseNewDefaultFonts( 1 ) // since version 2.0.22 we can use nicer default fonts
+
+// **** To-Do List **** //
+/*
+	Add notes on how pieces move
+*/
+// **** Notes: This is just a list of all the sprite ID's. This is not part of the actual code. **** //
+/* 
+	Sprite Id's:
+		Squares: 10 to 109 
+		White		
+		Soldierwhite: 130 to 139		
+		Artillery on square 101: 140
+		Artillery on square 108: 141		
+		Cavalry on square 102: 142
+		Cavalry on square 107: 143		
+		Chancellor on square 103: 144		
+		General on square 106: 145	
+		King on square 104: 146
+		President on square 105: 147		
+		Tank on square 100: 148
+		Tank on square 109: 149
+		
+		Black
+		Soldierblack: 110 to 119
+		Artillery on square 11: 120
+		Artillery on square 18: 121
+		Cavalry on square 12: 122
+		Cavalry on square 17: 123
+		Chancellor on square 13: 124
+		General on square 16: 125
+		King on square 14: 126
+		President on square 15: 127
+		Tank on square 10: 128
+		Tank on square 19: 129
+*/
+
+/* Piece Movement
+	Soldier: Moves 1 unit in any direction except backwards. If the soldier has not moved yet the soldier has
+		a choice of moving 2 units forward.
+	Tank: Moves in a straight line.
+	Artillery: Moves like a tank but attacks by hopping over another piece first (can be black or white)
+	Cavalry: Moves 2 units in a straight line then 1 unit perpendicular
+	Chancellor: Moves like a tank and cavalry
+	King: Moves 1 unit in any direction
+	President: Moves in a straight line and diagonally
+	General: Moves diagonally and like cavalry
+*/
+
+/* Gosub Map: Indentation means "within".
+	gosub soldiermovedisplay
+		gosub soldierwhite
+			gosub runthroughwhitechecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetblackattacks
+				gosub updateblackattacks
+					gosub soldierblacklegalmovechecklist
+					gosub artilleryblackattacklegalmovechecklist
+					gosub cavalryblacklegalmovechecklist
+					gosub tankblacklegalmovechecklist
+					gosub diagonalblacklegalmovechecklist
+					gosub kingblacklegalmovechecklist
+		gosub soldierblack
+			gosub runthroughblackchecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetwhiteattacks	
+				gosub updatewhiteattacks
+					gosub soldierwhiteattacklegalmovechecklist
+					gosub artillerywhiteattacklegalmovechecklist
+					gosub cavalrywhitelegalmovechecklist
+					gosub tankwhitelegalmovechecklist
+					gosub diagonalwhitelegalmovechecklist
+					gosub kingwhitelegalmovechecklist
+	gosub kingmovedisplay
+		gosub kingwhite
+			gosub runthroughwhitechecklistkingvariation
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetblackattacks
+				gosub updateblackattacks
+					gosub soldierblacklegalmovechecklist
+					gosub artilleryblackattacklegalmovechecklist
+					gosub cavalryblacklegalmovechecklist
+					gosub tankblacklegalmovechecklist
+					gosub diagonalblacklegalmovechecklist
+					gosub kingblacklegalmovechecklist
+		gosub kingblack
+			gosub runthroughblackchecklistkingvariation
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetwhiteattacks	
+				gosub updatewhiteattacks
+					gosub soldierwhiteattacklegalmovechecklist
+					gosub artillerywhiteattacklegalmovechecklist
+					gosub cavalrywhitelegalmovechecklist
+					gosub tankwhitelegalmovechecklist
+					gosub diagonalwhitelegalmovechecklist
+					gosub kingwhitelegalmovechecklist
+	gosub tankmovedisplay
+		gosub tankwhite	
+			gosub runthroughwhitechecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetblackattacks
+				gosub updateblackattacks
+					gosub soldierblacklegalmovechecklist
+					gosub artilleryblackattacklegalmovechecklist
+					gosub cavalryblacklegalmovechecklist
+					gosub tankblacklegalmovechecklist
+					gosub diagonalblacklegalmovechecklist
+					gosub kingblacklegalmovechecklist
+		gosub tankblack
+			gosub runthroughblackchecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetwhiteattacks	
+				gosub updatewhiteattacks
+					gosub soldierwhiteattacklegalmovechecklist
+					gosub artillerywhiteattacklegalmovechecklist
+					gosub cavalrywhitelegalmovechecklist
+					gosub tankwhitelegalmovechecklist
+					gosub diagonalwhitelegalmovechecklist
+					gosub kingwhitelegalmovechecklist
+	gosub cavalrymovedisplay
+		gosub cavalrywhite
+			gosub runthroughwhitechecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetblackattacks
+				gosub updateblackattacks
+					gosub soldierblacklegalmovechecklist
+					gosub artilleryblackattacklegalmovechecklist
+					gosub cavalryblacklegalmovechecklist
+					gosub tankblacklegalmovechecklist
+					gosub diagonalblacklegalmovechecklist
+					gosub kingblacklegalmovechecklist
+		gosub cavalryblack
+			gosub runthroughblackchecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetwhiteattacks	
+				gosub updatewhiteattacks
+					gosub soldierwhiteattacklegalmovechecklist
+					gosub artillerywhiteattacklegalmovechecklist
+					gosub cavalrywhitelegalmovechecklist
+					gosub tankwhitelegalmovechecklist
+					gosub diagonalwhitelegalmovechecklist
+					gosub kingwhitelegalmovechecklist
+	gosub chancellormovedisplay
+		gosub cavalrywhite
+			gosub runthroughwhitechecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetblackattacks
+				gosub updateblackattacks
+					gosub soldierblacklegalmovechecklist
+					gosub artilleryblackattacklegalmovechecklist
+					gosub cavalryblacklegalmovechecklist
+					gosub tankblacklegalmovechecklist
+					gosub diagonalblacklegalmovechecklist
+					gosub kingblacklegalmovechecklist
+		gosub tankwhite
+			gosub runthroughwhitechecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetblackattacks
+				gosub updateblackattacks
+					gosub soldierblacklegalmovechecklist
+					gosub artilleryblackattacklegalmovechecklist
+					gosub cavalryblacklegalmovechecklist
+					gosub tankblacklegalmovechecklist
+					gosub diagonalblacklegalmovechecklist
+					gosub kingblacklegalmovechecklist
+		gosub cavalryblack
+			gosub runthroughblackchecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetwhiteattacks	
+				gosub updatewhiteattacks
+					gosub soldierwhiteattacklegalmovechecklist
+					gosub artillerywhiteattacklegalmovechecklist
+					gosub cavalrywhitelegalmovechecklist
+					gosub tankwhitelegalmovechecklist
+					gosub diagonalwhitelegalmovechecklist
+					gosub kingwhitelegalmovechecklist
+		gosub tankblack
+			gosub runthroughblackchecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetwhiteattacks	
+				gosub updatewhiteattacks
+					gosub soldierwhiteattacklegalmovechecklist
+					gosub artillerywhiteattacklegalmovechecklist
+					gosub cavalrywhitelegalmovechecklist
+					gosub tankwhitelegalmovechecklist
+					gosub diagonalwhitelegalmovechecklist
+					gosub kingwhitelegalmovechecklist
+	gosub generalmovedisplay
+		gosub cavalrywhite
+			gosub runthroughwhitechecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetblackattacks
+				gosub updateblackattacks
+					gosub soldierblacklegalmovechecklist
+					gosub artilleryblackattacklegalmovechecklist
+					gosub cavalryblacklegalmovechecklist
+					gosub tankblacklegalmovechecklist
+					gosub diagonalblacklegalmovechecklist
+					gosub kingblacklegalmovechecklist
+		gosub diagonalwhite
+			gosub runthroughwhitechecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetblackattacks
+				gosub updateblackattacks
+					gosub soldierblacklegalmovechecklist
+					gosub artilleryblackattacklegalmovechecklist
+					gosub cavalryblacklegalmovechecklist
+					gosub tankblacklegalmovechecklist
+					gosub diagonalblacklegalmovechecklist
+					gosub kingblacklegalmovechecklist
+		gosub cavalryblack
+			gosub runthroughblackchecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetwhiteattacks	
+				gosub updatewhiteattacks
+		gosub diagonalblack
+			gosub runthroughblackchecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetwhiteattacks	
+				gosub updatewhiteattacks
+					gosub soldierwhiteattacklegalmovechecklist
+					gosub artillerywhiteattacklegalmovechecklist
+					gosub cavalrywhitelegalmovechecklist
+					gosub tankwhitelegalmovechecklist
+					gosub diagonalwhitelegalmovechecklist
+					gosub kingwhitelegalmovechecklist
+	gosub presidentmovedisplay
+		gosub tankwhite
+			gosub runthroughwhitechecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetblackattacks
+				gosub updateblackattacks
+					gosub soldierblacklegalmovechecklist
+					gosub artilleryblackattacklegalmovechecklist
+					gosub cavalryblacklegalmovechecklist
+					gosub tankblacklegalmovechecklist
+					gosub diagonalblacklegalmovechecklist
+					gosub kingblacklegalmovechecklist
+		gosub diagonalwhite
+			gosub runthroughwhitechecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetblackattacks
+				gosub updateblackattacks
+					gosub soldierblacklegalmovechecklist
+					gosub artilleryblackattacklegalmovechecklist
+					gosub cavalryblacklegalmovechecklist
+					gosub tankblacklegalmovechecklist
+					gosub diagonalblacklegalmovechecklist
+					gosub kingblacklegalmovechecklist
+		gosub tankblack
+			gosub runthroughblackchecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetwhiteattacks	
+				gosub updatewhiteattacks
+					gosub soldierwhiteattacklegalmovechecklist
+					gosub artillerywhiteattacklegalmovechecklist
+					gosub cavalrywhitelegalmovechecklist
+					gosub tankwhitelegalmovechecklist
+					gosub diagonalwhitelegalmovechecklist
+					gosub kingwhitelegalmovechecklist
+		gosub diagonalblack
+			gosub runthroughblackchecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetwhiteattacks	
+				gosub updatewhiteattacks
+					gosub soldierwhiteattacklegalmovechecklist
+					gosub artillerywhiteattacklegalmovechecklist
+					gosub cavalrywhitelegalmovechecklist
+					gosub tankwhitelegalmovechecklist
+					gosub diagonalwhitelegalmovechecklist
+					gosub kingwhitelegalmovechecklist
+	gosub artillerymovedisplay
+		gosub artillerywhite
+			gosub runthroughwhitechecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetblackattacks
+				gosub updateblackattacks
+					gosub soldierblacklegalmovechecklist
+					gosub artilleryblackattacklegalmovechecklist
+					gosub cavalryblacklegalmovechecklist
+					gosub tankblacklegalmovechecklist
+					gosub diagonalblacklegalmovechecklist
+					gosub kingblacklegalmovechecklist
+		gosub artilleryblack
+			gosub runthroughblackchecklist
+				gosub resetblackpiecepositions
+				gosub resetwhitepiecepositions
+				gosub resetwhiteattacks	
+				gosub updatewhiteattacks
+					gosub soldierwhiteattacklegalmovechecklist
+					gosub artillerywhiteattacklegalmovechecklist
+					gosub cavalrywhitelegalmovechecklist
+					gosub tankwhitelegalmovechecklist
+					gosub diagonalwhitelegalmovechecklist
+					gosub kingwhitelegalmovechecklist
+	gosub piecemovement
+		gosub changeturns
+	gosub turnoffchangeturns
+	gosub updatepossiblemoves 
+		gosub soldiermovedisplay2
+			gosub soldierwhite2
+				gosub runthroughwhitechecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetblackattacks
+					gosub updateblackattacks
+						gosub soldierblacklegalmovechecklist
+						gosub artilleryblackattacklegalmovechecklist
+						gosub cavalryblacklegalmovechecklist
+						gosub tankblacklegalmovechecklist
+						gosub diagonalblacklegalmovechecklist
+						gosub kingblacklegalmovechecklist
+			gosub soldierblack2
+				gosub runthroughblackchecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetwhiteattacks
+					gosub updatewhiteattacks
+						gosub soldierwhiteattacklegalmovechecklist
+						gosub artillerywhiteattacklegalmovechecklist
+						gosub cavalrywhitelegalmovechecklist
+						gosub tankwhitelegalmovechecklist
+						gosub diagonalwhitelegalmovechecklist
+						gosub kingwhitelegalmovechecklist
+		gosub kingmovedisplay2
+			gosub kingwhite2
+				gosub runthroughwhitechecklistkingvariation2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetblackattacks
+					gosub updateblackattacks
+						gosub soldierblacklegalmovechecklist
+						gosub artilleryblackattacklegalmovechecklist
+						gosub cavalryblacklegalmovechecklist
+						gosub tankblacklegalmovechecklist
+						gosub diagonalblacklegalmovechecklist
+						gosub kingblacklegalmovechecklist
+			gosub kingblack2
+				gosub runthroughblackchecklistkingvariation2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetwhiteattacks
+					gosub updatewhiteattacks
+						gosub soldierwhiteattacklegalmovechecklist
+						gosub artillerywhiteattacklegalmovechecklist
+						gosub cavalrywhitelegalmovechecklist
+						gosub tankwhitelegalmovechecklist
+						gosub diagonalwhitelegalmovechecklist
+						gosub kingwhitelegalmovechecklist
+		gosub tankmovedisplay2
+			gosub tankwhite2
+				gosub runthroughwhitechecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetblackattacks
+					gosub updateblackattacks
+						gosub soldierblacklegalmovechecklist
+						gosub artilleryblackattacklegalmovechecklist
+						gosub cavalryblacklegalmovechecklist
+						gosub tankblacklegalmovechecklist
+						gosub diagonalblacklegalmovechecklist
+						gosub kingblacklegalmovechecklist
+			gosub tankblack2
+				gosub runthroughblackchecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetwhiteattacks
+					gosub updatewhiteattacks
+						gosub soldierwhiteattacklegalmovechecklist
+						gosub artillerywhiteattacklegalmovechecklist
+						gosub cavalrywhitelegalmovechecklist
+						gosub tankwhitelegalmovechecklist
+						gosub diagonalwhitelegalmovechecklist
+						gosub kingwhitelegalmovechecklist
+		gosub cavalrymovedisplay2
+			gosub cavalrywhite2
+				gosub runthroughwhitechecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetblackattacks
+					gosub updateblackattacks
+						gosub soldierblacklegalmovechecklist
+						gosub artilleryblackattacklegalmovechecklist
+						gosub cavalryblacklegalmovechecklist
+						gosub tankblacklegalmovechecklist
+						gosub diagonalblacklegalmovechecklist
+						gosub kingblacklegalmovechecklist
+			gosub cavalryblack2
+				gosub runthroughblackchecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetwhiteattacks
+					gosub updatewhiteattacks
+						gosub soldierwhiteattacklegalmovechecklist
+						gosub artillerywhiteattacklegalmovechecklist
+						gosub cavalrywhitelegalmovechecklist
+						gosub tankwhitelegalmovechecklist
+						gosub diagonalwhitelegalmovechecklist
+						gosub kingwhitelegalmovechecklist
+		gosub chancellormovedisplay2
+			gosub cavalrywhite2
+				gosub runthroughwhitechecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetblackattacks
+					gosub updateblackattacks
+						gosub soldierblacklegalmovechecklist
+						gosub artilleryblackattacklegalmovechecklist
+						gosub cavalryblacklegalmovechecklist
+						gosub tankblacklegalmovechecklist
+						gosub diagonalblacklegalmovechecklist
+						gosub kingblacklegalmovechecklist
+			gosub tankwhite2
+				gosub runthroughwhitechecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetblackattacks
+					gosub updateblackattacks
+						gosub soldierblacklegalmovechecklist
+						gosub artilleryblackattacklegalmovechecklist
+						gosub cavalryblacklegalmovechecklist
+						gosub tankblacklegalmovechecklist
+						gosub diagonalblacklegalmovechecklist
+						gosub kingblacklegalmovechecklist
+			gosub cavalryblack2
+				gosub runthroughblackchecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetwhiteattacks
+					gosub updatewhiteattacks
+						gosub soldierwhiteattacklegalmovechecklist
+						gosub artillerywhiteattacklegalmovechecklist
+						gosub cavalrywhitelegalmovechecklist
+						gosub tankwhitelegalmovechecklist
+						gosub diagonalwhitelegalmovechecklist
+						gosub kingwhitelegalmovechecklist
+			gosub tankblack2
+				gosub runthroughblackchecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetwhiteattacks
+					gosub updatewhiteattacks
+						gosub soldierwhiteattacklegalmovechecklist
+						gosub artillerywhiteattacklegalmovechecklist
+						gosub cavalrywhitelegalmovechecklist
+						gosub tankwhitelegalmovechecklist
+						gosub diagonalwhitelegalmovechecklist
+						gosub kingwhitelegalmovechecklist
+		gosub generalmovedisplay2
+			gosub cavalrywhite2
+				gosub runthroughwhitechecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetblackattacks
+					gosub updateblackattacks
+						gosub soldierblacklegalmovechecklist
+						gosub artilleryblackattacklegalmovechecklist
+						gosub cavalryblacklegalmovechecklist
+						gosub tankblacklegalmovechecklist
+						gosub diagonalblacklegalmovechecklist
+						gosub kingblacklegalmovechecklist
+			gosub diagonalwhite2
+				gosub runthroughwhitechecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetblackattacks
+					gosub updateblackattacks
+						gosub soldierblacklegalmovechecklist
+						gosub artilleryblackattacklegalmovechecklist
+						gosub cavalryblacklegalmovechecklist
+						gosub tankblacklegalmovechecklist
+						gosub diagonalblacklegalmovechecklist
+						gosub kingblacklegalmovechecklist
+			gosub cavalryblack2
+				gosub runthroughblackchecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetwhiteattacks
+					gosub updatewhiteattacks
+						gosub soldierwhiteattacklegalmovechecklist
+						gosub artillerywhiteattacklegalmovechecklist
+						gosub cavalrywhitelegalmovechecklist
+						gosub tankwhitelegalmovechecklist
+						gosub diagonalwhitelegalmovechecklist
+						gosub kingwhitelegalmovechecklist
+			gosub diagonalblack2
+				gosub runthroughblackchecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetwhiteattacks
+					gosub updatewhiteattacks
+						gosub soldierwhiteattacklegalmovechecklist
+						gosub artillerywhiteattacklegalmovechecklist
+						gosub cavalrywhitelegalmovechecklist
+						gosub tankwhitelegalmovechecklist
+						gosub diagonalwhitelegalmovechecklist
+						gosub kingwhitelegalmovechecklist
+		gosub presidentmovedisplay2
+			gosub tankwhite2
+				gosub runthroughwhitechecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetblackattacks
+					gosub updateblackattacks
+						gosub soldierblacklegalmovechecklist
+						gosub artilleryblackattacklegalmovechecklist
+						gosub cavalryblacklegalmovechecklist
+						gosub tankblacklegalmovechecklist
+						gosub diagonalblacklegalmovechecklist
+						gosub kingblacklegalmovechecklist
+			gosub diagonalwhite2
+				gosub runthroughwhitechecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetblackattacks
+					gosub updateblackattacks
+						gosub soldierblacklegalmovechecklist
+						gosub artilleryblackattacklegalmovechecklist
+						gosub cavalryblacklegalmovechecklist
+						gosub tankblacklegalmovechecklist
+						gosub diagonalblacklegalmovechecklist
+						gosub kingblacklegalmovechecklist
+			gosub tankblack2
+				gosub runthroughblackchecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetwhiteattacks
+					gosub updatewhiteattacks
+						gosub soldierwhiteattacklegalmovechecklist
+						gosub artillerywhiteattacklegalmovechecklist
+						gosub cavalrywhitelegalmovechecklist
+						gosub tankwhitelegalmovechecklist
+						gosub diagonalwhitelegalmovechecklist
+						gosub kingwhitelegalmovechecklist
+			gosub diagonalblack2
+				gosub runthroughblackchecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetwhiteattacks
+					gosub updatewhiteattacks
+						gosub soldierwhiteattacklegalmovechecklist
+						gosub artillerywhiteattacklegalmovechecklist
+						gosub cavalrywhitelegalmovechecklist
+						gosub tankwhitelegalmovechecklist
+						gosub diagonalwhitelegalmovechecklist
+						gosub kingwhitelegalmovechecklist
+		gosub artillerymovedisplay2
+			gosub artillerywhite2
+				gosub runthroughwhitechecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetblackattacks
+					gosub updateblackattacks
+						gosub soldierblacklegalmovechecklist
+						gosub artilleryblackattacklegalmovechecklist
+						gosub cavalryblacklegalmovechecklist
+						gosub tankblacklegalmovechecklist
+						gosub diagonalblacklegalmovechecklist
+						gosub kingblacklegalmovechecklist
+			gosub artilleryblack2
+				gosub runthroughblackchecklist2
+					gosub resetblackpiecepositions
+					gosub resetwhitepiecepositions
+					gosub resetwhiteattacks
+					gosub updatewhiteattacks
+						gosub soldierwhiteattacklegalmovechecklist
+						gosub artillerywhiteattacklegalmovechecklist
+						gosub cavalrywhitelegalmovechecklist
+						gosub tankwhitelegalmovechecklist
+						gosub diagonalwhitelegalmovechecklist
+						gosub kingwhitelegalmovechecklist
+*/
+
+#Include "Subroutines.agc"
+#Include "legalmovechecklist.agc"
+#Include "possiblelegalmoves.agc"
+
+do
+// **** Variables **** //
+blacksquarecolorred = 167
+blacksquarecolorgreen = 108
+blacksquarecolorblue = 86
+whitesquarecolorred = 242
+whitesquarecolorgreen = 210
+whitesquarecolorblue = 171
+spriteid = 0
+playerturn = 1 // 1 means that it is player 1's turn. 2 means that it is player 2's turn //
+turnchangetime = 0 // Stores the time that a turn is changed //
+movecount = 0
+endscreentextid = 0
+
+// **** Colors **** //
+// White Piece color (214, 163, 86)
+squareblack = CreateImageColor(167, 108, 86, 255)
+squarewhite = CreateImageColor(242, 210, 171, 255)
+blue = CreateImageColor(0, 0, 255, 255)
+white = CreateImageColor(255, 255, 255, 255)
+black = CreateImageColor(0, 0, 0, 255)
+lightgrey = CreateImageColor(200, 200, 200, 255)
+darkgrey = CreateImageColor(55, 55, 55, 255)
+
+// Images //
+artillerywhite = LoadImage("artillerywhite.png")
+artilleryblack = LoadImage("artilleryblack.png")
+chessboard = LoadImage("chessboard.png")
+cavalrywhite = LoadImage("cavalrywhite.png")
+cavalryblack = LoadImage("cavalryblack.png")
+tankblack = LoadImage("tankblack.png")
+tankwhite = LoadImage("tankwhite.png")
+soldierblack = LoadImage("soldierblack.png")
+soldierwhite = LoadImage("soldierwhite.png")
+chancellorblack = LoadImage("chancellorblack.png")
+chancellorwhite = LoadImage("chancellorwhite.png")
+generalblack = LoadImage("generalblack.png")
+generalwhite = LoadImage("generalwhite.png")
+kingblack = LoadImage("kingblack.png")
+kingwhite = LoadImage("kingwhite.png")
+presidentblack = LoadImage("presidentblack.png")
+presidentwhite = LoadImage("presidentwhite.png")
+
+// **** Start Screen **** //
+	// Background //
+startscreenbackground = CreateSprite(lightgrey)
+SetSpriteSize(startscreenbackground, GetVirtualWidth(), GetVirtualHeight())
+startscreenbackgroundx = 0
+startscreenbackgroundy = 0
+SetSpritePosition(startscreenbackground, startscreenbackgroundx, startscreenbackgroundy)
+	// Play Button //
+playbutton = CreateText("Play")
+SetTextSize(playbutton, 50)
+playbuttonx = GetVirtualWidth()/2 - GetTextTotalWidth(playbutton)/2
+playbuttony = GetVirtualHeight()/2 - GetTextTotalHeight(playbutton)/2
+SetTextPosition(playbutton, playbuttonx, playbuttony)
+
+	// Start Screen Code //
+do
+	// Play Button Commands //
+	if GetTextHitTest(playbutton, GetPointerX(), GetPointerY())
+		SetTextSize(playbutton, 60)
+		playbuttonx = GetVirtualWidth()/2 - GetTextTotalWidth(playbutton)/2
+		playbuttony = GetVirtualHeight()/2 - GetTextTotalHeight(playbutton)/2
+		SetTextPosition(playbutton, playbuttonx, playbuttony)
+		if GetPointerPressed() = 1
+			sync()
+			DeleteAllText()
+			DeleteAllSprites()
+			exit
+		endif
+	else
+		SetTextSize(playbutton, 50)
+		playbuttonx = GetVirtualWidth()/2 - GetTextTotalWidth(playbutton)/2
+		playbuttony = GetVirtualHeight()/2 - GetTextTotalHeight(playbutton)/2
+		SetTextPosition(playbutton, playbuttonx, playbuttony)
+	endif
+	sync()
+loop
+
+// **** In-Game Sprites **** //
+// Chessboard //
+chessboardsprite = CreateSprite(chessboard)
+SetSpriteSize(chessboardsprite, GetVirtualWidth(), GetVirtualHeight())
+
+// These lists are used to determine legal moves //
+/*
+There are 100 elements representing each square. Each of the 100 elements contains in itself 6 elements. The 6 elements 
+are represented by 0's and 1's. Element 1 represents a square that is occupied by a black piece. Element 2 represents a square 
+that is being attacked by a black piece. Element 3 represents the squares that black can LEGALLY go to. Element 4 represents a 
+square that is occupied by a white piece. Element 5 represents a square that is being attacked by a white piece. Element 6
+represents the squares that white can LEGALLY go to. 
+*/
+legalmovechecklist as integer [109, 6]
+
+// Squares //
+	// Creates the square on the top left corner //
+squarex as integer [109]
+squarey as integer [109]
+squarex[10] = 0
+squarey[10] = 0
+CreateSprite(10, white)
+SetSpritePosition(10, squarex[10], squarey[10])
+SetSpriteSize(10, GetVirtualWidth()/10, GetVirtualHeight()/10)
+SetSpriteColor(10, 0, 200, 150, 0)
+legalmovechecklist[10, 1] = 0
+legalmovechecklist[10, 2] = 0
+legalmovechecklist[10, 3] = 0
+legalmovechecklist[10, 4] = 0
+legalmovechecklist[10, 5] = 0
+legalmovechecklist[10, 6] = 0
+
+	// Creates all the squares other than the one on the top left corner //
+for i = 11 to 109
+	CreateSprite(i, white)
+	squarex[i] = squarex[i - 1] + 80
+	if squarex[i] >= GetVirtualWidth()
+		squarex[i] = 0
+		squarey[i] = squarey[i - 1] + 80
+	else
+		squarey[i] = squarey[i - 1]
+	endif
+	SetSpritePosition(i, squarex[i], squarey[i])
+	SetSpriteSize(i, GetVirtualWidth()/10, GetVirtualHeight()/10)
+	SetSpriteColor(i, 0, 200, 150, 0)
+	legalmovechecklist[i, 1] = 0
+	legalmovechecklist[i, 2] = 0
+	legalmovechecklist[i, 3] = 0
+	legalmovechecklist[i, 4] = 0
+	legalmovechecklist[i, 5] = 0
+	legalmovechecklist[i, 6] = 0
+next i
+
+// Piece Positions //
+	// * This is not used to determine legal moves * //
+position as integer [149, 2] // For every sprite there are two elements. 1 is its "x" coordinate and 2 is its "y" coordinate
+
+// Artillery //
+	// White 1 //
+CreateSprite(140, artillerywhite)
+SetSpriteSize(140, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[140, 1] = squarex[101]
+position[140, 2] = squarey[101]
+SetSpritePosition(140, position[140, 1], position[140, 2])
+
+	// White 2 //
+CreateSprite(141, artillerywhite)
+SetSpriteSize(141, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[141, 1] = squarex[108]
+position[141, 2] = squarey[108]
+SetSpritePosition(141, position[141, 1], position[141, 2])
+
+	// Black 1 //
+CreateSprite(120, artilleryblack)
+SetSpriteSize(120, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[120, 1] = squarex[11]
+position[120, 2] = squarey[11]
+SetSpritePosition(120, position[120, 1], position[120, 2])
+
+	// Black 2 //
+CreateSprite(121, artilleryblack)
+SetSpriteSize(121, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[121, 1] = squarex[18]
+position[121, 2] = squarey[18]
+SetSpritePosition(121, position[121, 1], position[121, 2])
+
+// Cavalry //
+	// White 1 //
+CreateSprite(142, cavalrywhite)
+SetSpriteSize(142, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[142, 1] = squarex[102]
+position[142, 2] = squarey[102]
+SetSpritePosition(142, position[142, 1], position[142, 2])
+
+	// White 2 //
+CreateSprite(143, cavalrywhite)
+SetSpriteSize(143, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[143, 1] = squarex[107]
+position[143, 2] = squarey[107]
+SetSpritePosition(143, position[143, 1], position[143, 2])
+
+	// Black 1 //
+CreateSprite(122, cavalryblack)
+SetSpriteSize(122, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[122, 1] = squarex[12]
+position[122, 2] = squarey[12]
+SetSpritePosition(122, position[122, 1], position[122, 2])
+
+	// Black 2 //
+CreateSprite(123, cavalryblack)
+SetSpriteSize(123, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[123, 1] = squarex[17]
+position[123, 2] = squarey[17]
+SetSpritePosition(123, position[123, 1], position[123, 2])
+// Tank //
+	// White 1 //
+CreateSprite(148, tankwhite)
+SetSpriteSize(148, GetVirtualWidth()/10, GetVirtualHeight()/10)
+SetSpriteAngle(148, 270)
+position[148, 1] = squarex[100]
+position[148, 2] = squarey[100]
+SetSpritePosition(148, position[148, 1], position[148, 2])
+
+	// White 2 //
+CreateSprite(149, tankwhite)
+SetSpriteSize(149, GetVirtualWidth()/10, GetVirtualHeight()/10)
+SetSpriteAngle(149, 270)
+position[149, 1] = squarex[109]
+position[149, 2] = squarey[109]
+SetSpritePosition(149, position[149, 1], position[149, 2])
+
+	// Black 1 //
+CreateSprite(128, tankblack)
+SetSpriteSize(128, GetVirtualWidth()/10, GetVirtualHeight()/10)
+SetSpriteAngle(128, 90)
+position[128, 1] = squarex[10]
+position[128, 2] = squarey[10]
+SetSpritePosition(128, position[128, 1], position[128, 2])
+
+	// Black 2 //
+CreateSprite(129, tankblack)
+SetSpriteSize(129, GetVirtualWidth()/10, GetVirtualHeight()/10)
+SetSpriteAngle(129, 90)
+position[129, 1] = squarex[19]
+position[129, 2] = squarey[19]
+SetSpritePosition(129, position[129, 1], position[129, 2])
+
+// Soldiers //
+	// White //
+for x = 130 to 139
+	CreateSprite(x, soldierwhite)
+	SetSpriteSize(x, GetVirtualWidth()/10, GetVirtualHeight()/10)
+	position[x, 1] = squarex[x - 40]
+	position[x, 2] = squarey[x - 40]
+	SetSpritePosition(x, position[x, 1], position[x, 2])
+next x
+
+	// Black //
+for x = 110 to 119
+	CreateSprite(x, soldierblack)
+	SetSpriteSize(x, GetVirtualWidth()/10, GetVirtualHeight()/10)
+	position[x, 1] = squarex[x - 90]
+	position[x, 2] = squarey[x - 90]
+	SetSpritePosition(x, position[x, 1], position[x, 2])
+next x
+
+// Chancellor //
+	// White //
+CreateSprite(144, chancellorwhite)
+SetSpriteSize(144, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[144, 1] = squarex[103]
+position[144, 2] = squarey[103]
+SetSpritePosition(144, position[144, 1], position[144, 2])
+
+	// Black //
+CreateSprite(124, chancellorblack)
+SetSpriteSize(124, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[124, 1] = squarex[13]
+position[124, 2] = squarey[13]
+SetSpritePosition(124, position[124, 1], position[124, 2])
+
+// General //
+	// White //
+CreateSprite(145, generalwhite)
+SetSpriteSize(145, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[145, 1] = squarex[106]
+position[145, 2] = squarey[106]
+SetSpritePosition(145, position[145, 1], position[145, 2])
+
+	// Black //
+CreateSprite(125, generalblack)
+SetSpriteSize(125, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[125, 1] = squarex[16]
+position[125, 2] = squarey[16]
+SetSpritePosition(125, position[125, 1], position[125, 2])
+
+// King //
+	// White //
+CreateSprite(146, kingwhite)
+SetSpriteSize(146, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[146, 1] = squarex[104]
+position[146, 2] = squarey[104]
+SetSpritePosition(146, position[146, 1], position[146, 2])
+
+	// Black //
+CreateSprite(126, kingblack)
+SetSpriteSize(126, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[126, 1] = squarex[14]
+position[126, 2] = squarey[14]
+SetSpritePosition(126, position[126, 1], position[126, 2])
+
+// President //
+	// White //
+CreateSprite(147, presidentwhite)
+SetSpriteSize(147, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[147, 1] = squarex[105]
+position[147, 2] = squarey[105]
+SetSpritePosition(147, position[147, 1], position[147, 2])
+
+	// Black //
+CreateSprite(127, presidentblack)
+SetSpriteSize(127, GetVirtualWidth()/10, GetVirtualHeight()/10)
+position[127, 1] = squarex[15]
+position[127, 2] = squarey[15]
+SetSpritePosition(127, position[127, 1], position[127, 2])
+
+	// Turn //
+turn = CreateText("Insert Player Here")
+SetTextSize(turn, 50)
+SetTextColor(turn, 255, 0, 0, 0)
+turnx = GetVirtualWidth()/2 - GetTextTotalWidth(turn)/2
+turny = GetVirtualHeight()/2 - GetTextTotalHeight(turn)/2
+SetTextPosition(turn, turnx, turny) 
+
+remstart
+for x = 110 to 129
+	SetSpriteColorAlpha(x, 0)
+	if x = 126
+		SetSpriteColorAlpha(x, 255)
+	endif
+next x
+remend
+
+// **** In-Game Code **** //
+do
+	// I have turnoffchangeturns after each move display because it took too long for the code to run through all the subroutines //
+	remstart
+	v = 2
+	for i = 10 to 19
+		PrintC(legalmovechecklist[i, v])
+	next i
+	Print("")
+	for i = 20 to 29
+		PrintC(legalmovechecklist[i, v])
+	next i
+	Print("")
+	for i = 30 to 39
+		PrintC(legalmovechecklist[i, v])
+	next i
+	Print("")
+	for i = 40 to 49
+		PrintC(legalmovechecklist[i, v])
+	next i
+	Print("")
+	for i = 50 to 59
+		PrintC(legalmovechecklist[i, v])
+	next i
+	Print("")
+	for i = 60 to 69
+		PrintC(legalmovechecklist[i, v])
+	next i
+	Print("")
+	for i = 70 to 79
+		PrintC(legalmovechecklist[i, v])
+	next i
+	Print("")
+	for i = 80 to 89
+		PrintC(legalmovechecklist[i, v])
+	next i
+	Print("")
+	for i = 90 to 99
+		PrintC(legalmovechecklist[i, v])
+	next i
+	Print("")
+	for i = 100 to 109
+		PrintC(legalmovechecklist[i, v])
+	next i
+	//gosub resetblackpiecepositions
+	//gosub resetwhitepiecepositions
+	//gosub updateblackattacks
+	//gosub updatewhiteattacks
+	remend
+	gosub soldiermovedisplay
+	gosub turnoffchangeturns
+	gosub kingmovedisplay
+	gosub turnoffchangeturns
+	gosub tankmovedisplay
+	gosub turnoffchangeturns
+	gosub cavalrymovedisplay
+	gosub turnoffchangeturns
+	gosub chancellormovedisplay
+	gosub turnoffchangeturns
+	gosub generalmovedisplay
+	gosub turnoffchangeturns
+	gosub presidentmovedisplay
+	gosub turnoffchangeturns
+	gosub artillerymovedisplay
+	gosub turnoffchangeturns
+	gosub piecemovement
+	gosub turnoffchangeturns
+	// White //	
+	if playerturn = 1
+		sum = 0 // This is used to count how many squares the player can LEGALLY go to.
+		gosub updatepossiblemoves
+		for possiblesquare = 10 to 109
+			sum = sum + legalmovechecklist[possiblesquare, 6] 
+		next possiblesquare
+		if sum = 0 
+			for kingposition = 10 to 109
+				if position[146, 1] = squarex[kingposition] and position[146, 2] = squarey[kingposition]
+					gosub resetwhitepiecepositions
+					gosub resetblackpiecepositions
+					gosub resetblackattacks
+					gosub updateblackattacks
+					if legalmovechecklist[kingposition, 2] = 1 
+						// White King is Checkmated //
+						endscreentextid = 2
+						exit
+					endif
+					if legalmovechecklist[kingposition, 2] = 0
+						// White King is Stalemated //
+						endscreentextid = 3
+						exit
+					endif
+				endif
+			next kingposition		
+		endif
+		if movecount >= 150
+			endscreentextid = 4
+			DeleteAllText()
+			exit
+		endif
+	endif
+	// Black //
+	if playerturn = 2
+		sum = 0
+		gosub updatepossiblemoves
+		for possiblesquare = 10 to 109
+			sum = sum + legalmovechecklist[possiblesquare, 3]
+		next possiblesquare
+		if sum = 0
+			for kingposition = 10 to 109
+				if position[126, 1] = squarex[kingposition] and position[126, 2] = squarey[kingposition]
+					gosub resetwhitepiecepositions
+					gosub resetblackpiecepositions
+					gosub resetwhiteattacks
+					gosub updatewhiteattacks
+					if legalmovechecklist[kingposition, 5] = 1
+						// Black King is Checkmated //
+						endscreentextid = 1
+						exit
+					endif
+					if legalmovechecklist[kingposition, 5] = 0
+						// Black King is Stalemated //
+						endscreentextid = 3
+						exit
+					endif
+				endif
+			next kingposition			
+		endif
+		if movecount >= 150
+			endscreentextid = 4
+			DeleteAllText()
+			exit
+		endif
+	endif
+	if endscreentextid >0
+		DeleteAllText()
+		exit
+	endif
+    Sync()
+loop
+
+// **** End Screen **** //
+	// Text Box //
+if endscreentextid = 1 // White Wins //
+	textbox = CreateSprite(white)
+endif
+if endscreentextid = 2 // Black Wins //
+	textbox = CreateSprite(black)
+endif
+if endscreentextid = 3 // Stalemate //
+	textbox = CreateSprite(lightgrey)
+endif
+if endscreentextid = 4 // Move Limit Reached //
+	textbox = CreateSprite(darkgrey)
+endif
+SetSpriteSize(textbox, GetVirtualWidth(), GetVirtualHeight())
+textboxx = GetVirtualWidth()/2 - GetSpriteWidth(textbox)/2
+textboxy = GetVirtualHeight()/2 - GetSpriteHeight(textbox)/2
+SetSpritePosition(textbox, textboxx, textboxy)
+
+	// Text //
+endscreentexttop = CreateText("")
+endscreentextbot = CreateText("")
+if endscreentextid = 1
+	SetTextString(endscreentexttop, "White Wins")
+	SetTextString(endscreentextbot, "by Checkmate")
+	SetTextColor(endscreentexttop, 0, 0, 0, 255)
+	SetTextColor(endscreentextbot, 0, 0, 0, 255)
+endif
+if endscreentextid = 2
+	SetTextString(endscreentexttop, "Black Wins")
+	SetTextString(endscreentextbot, "by Checkmate")
+	SetTextColor(endscreentexttop, 255, 255, 255, 255)
+	SetTextColor(endscreentextbot, 255, 255, 255, 255)
+endif
+if endscreentextid = 3
+	SetTextString(endscreentexttop, "Game Drawn")
+	SetTextString(endscreentextbot, "by Stalemate")
+	SetTextColor(endscreentexttop, 55, 55, 55, 255)
+	SetTextColor(endscreentextbot, 55, 55, 55, 255)
+endif
+if endscreentextid = 4
+	SetTextString(endscreentexttop, "Game Drawn")
+	SetTextString(endscreentextbot, "Move Limit Reached")
+	SetTextColor(endscreentexttop, 200, 200, 200, 255)
+	SetTextColor(endscreentextbot, 200, 200, 200, 255)
+endif
+SetTextSize(endscreentexttop, 50)
+SetTextSize(endscreentextbot, 50)
+endscreentexttopx = GetVirtualWidth()/2 - GetTextTotalWidth(endscreentexttop)/2
+endscreentexttopy = GetVirtualHeight()/2 - GetTextTotalHeight(endscreentexttop)
+endscreentextbotx = GetVirtualWidth()/2 - GetTextTotalWidth(endscreentextbot)/2
+endscreentextboty = GetVirtualHeight()/2
+SetTextPosition(endscreentexttop, endscreentexttopx, endscreentexttopy)
+SetTextPosition(endscreentextbot, endscreentextbotx, endscreentextboty)
+
+	// Main Menu Button //
+mainmenubutton = CreateText("MAIN MENU")
+SetTextSize(mainmenubutton, 50)
+if endscreentextid = 1
+	SetTextColor(mainmenubutton, 0, 0, 0, 255)
+endif
+if endscreentextid = 2 
+	SetTextColor(mainmenubutton, 255, 255, 255, 255)
+endif
+if endscreentextid = 3
+	SetTextColor(mainmenubutton, 55, 55, 55, 255)
+endif
+if endscreentextid = 4
+	SetTextColor(mainmenubutton, 200, 200, 200, 255)
+endif
+mainmenubuttonx = GetVirtualWidth()/2 - GetTextTotalWidth(mainmenubutton)/2
+mainmenubuttony = GetVirtualHeight()*3/4 - GetTextTotalHeight(mainmenubutton)/2
+SetTextPosition(mainmenubutton, mainmenubuttonx, mainmenubuttony)
+
+// **** End Screen Code starts here **** //
+do
+	if GetTextHitTest(mainmenubutton, GetPointerX(), GetPointerY())
+		SetTextSize(mainmenubutton, 60)
+		mainmenubuttonx = GetVirtualWidth()/2 - GetTextTotalWidth(mainmenubutton)/2
+		mainmenubuttony = GetVirtualHeight()*3/4 - GetTextTotalHeight(mainmenubutton)/2
+		SetTextPosition(mainmenubutton, mainmenubuttonx, mainmenubuttony)
+		if GetPointerPressed() = 1
+			sync()
+			DeleteAllText()
+			DeleteAllSprites()
+			DeleteAllImages()
+			exit
+		endif
+	else
+		SetTextSize(mainmenubutton ,50)
+		mainmenubuttonx = GetVirtualWidth()/2 - GetTextTotalWidth(mainmenubutton)/2
+		mainmenubuttony = GetVirtualHeight()*3/4 - GetTextTotalHeight(mainmenubutton)/2
+		SetTextPosition(mainmenubutton, mainmenubuttonx, mainmenubuttony)
+	endif
+	sync()
+loop
+loop
+
+piecemovement:
+	// White //
+	if playerturn = 1
+		// When a player tries to take a turn twice //
+		for x = 110 to 129
+		if GetSpriteHitTest(x, GetPointerX(), GetPointerY())
+			if GetPointerPressed() = 1
+				if GetSpriteColorAlpha(x) = 255
+					gosub changeturns
+				endif
+			endif
+		endif
+		next x
+		for x = 130 to 149	// Check all White Pieces //
+			if spriteid = x
+				for i = 10 to 109	// Check all Squares //
+					if GetSpriteHitTest(i, GetPointerX(), GetPointerY()) = 1	// When mouse hovers over square //
+						if GetPointerPressed() = 1	// When mouse is pressed
+							if GetSpriteColorAlpha(i) = 150
+								position[x, 1] = squarex[i]
+								position[x, 2] = squarey[i]
+								SetSpritePosition(x, position[x, 1], position[x, 2])
+								for x = 110 to 129
+									if position[x, 1] = squarex[i] and position[x, 2] = squarey[i]
+										SetSpriteColorAlpha(x, 0)
+										// Black Piece on that square no longer exists //
+										legalmovechecklist[i, 1] = 0
+									endif
+								next x
+								// Resets all the Squares //
+								for i = 10 to 109
+									SetSpriteColorAlpha(i, 0)
+									legalmovechecklist[i, 2] = 0 // Reset Black Attacks //
+								next i
+								// Turns //
+								playerturn = 2
+								movecount = movecount + 1
+								gosub changeturns
+							endif
+						endif
+					endif
+				next i
+			endif
+		next x
+	endif
+	// Black //
+	if playerturn = 2
+		// When the player tries to take a turn twice //
+		for x = 130 to 149
+		if GetSpriteHitTest(x, GetPointerX(), GetPointerY())
+			if GetPointerPressed() = 1
+				if GetSpriteColorAlpha(x) = 255
+					gosub changeturns
+				endif
+			endif
+		endif
+		next x
+		for x = 110 to 129
+			if spriteid = x
+				for i = 10 to 109
+					if GetSpriteHitTest(i, GetPointerX(), GetPointerY()) = 1
+						if GetPointerPressed() = 1
+							if GetSpriteColorAlpha(i) = 150
+								position[x, 1] = squarex[i]
+								position[x, 2] = squarey[i]
+								SetSpritePosition(x, position[x, 1], position[x, 2])
+								for x = 130 to 149
+									if position[x, 1] = squarex[i] and position[x, 2] = squarey[i]
+										SetSpriteColorAlpha(x, 0)
+										legalmovechecklist[i, 4] = 0
+									endif
+								next x
+								for i = 10 to 109
+									SetSpriteColorAlpha(i, 0)
+									legalmovechecklist[i, 5] = 0 // Reset White Attacks //
+								next i
+								playerturn = 1
+								movecount = movecount + 1
+								gosub changeturns
+							endif
+						endif
+					endif
+				next i
+			endif
+		next x
+	endif
+return
+
+soldiermovedisplay:
+// Soldiers //
+	// White //
+	if playerturn = 1
+		for x = 130 to 139
+			if GetSpriteColorAlpha(x) = 255
+				if GetSpriteHitTest(x, GetPointerX(), GetPointerY()) = 1
+					if GetPointerPressed() = 1
+						spriteid = x
+						for i = 10 to 109
+							SetSpriteColorAlpha(i, 0)
+						next i
+						for i = 10 to 109
+							if squarex[i] = position[x, 1] and squarey[i] = position[x, 2]
+								gosub soldierwhite
+							endif
+						next i
+					endif
+				endif	
+			endif	
+		next x
+	endif
+	
+	// Black //
+	if playerturn = 2
+		for x = 110 to 119
+			if GetSpriteColorAlpha(x) = 255
+				if GetSpriteHitTest(x, GetPointerX(), GetPointerY())
+					if GetPointerPressed() = 1
+						spriteid = x
+						for i = 10 to 109
+							SetSpriteColorAlpha(i, 0)
+						next i
+						for i = 10 to 109
+							if squarex[i] = position[x, 1] and squarey[i] = position[x, 2]
+								gosub soldierblack
+							endif
+						next i
+					endif
+				endif
+			endif
+		next x
+	endif
+return
+
+kingmovedisplay:
+// King //
+	// White //
+	if playerturn = 1
+		if GetSpriteColorAlpha(146) = 255
+			if GetSpriteHitTest(146, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 146
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[146, 1] and squarey[i] = position[146, 2] // Looks for the King
+							gosub kingwhite
+						endif
+					next i 
+				endif
+			endif
+		endif
+	endif
+	// Black //
+	if playerturn = 2
+		if GetSpriteColorAlpha(126) = 255
+			if GetSpriteHitTest(126, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 126
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[126, 1] and squarey[i] = position[126, 2]
+							gosub kingblack
+						endif
+					next i 
+				endif
+			endif
+		endif
+	endif
+return
+
+tankmovedisplay:
+// Tank //
+	// White //
+		// Starts on Square 100 //
+	if playerturn = 1
+		if GetSpriteColorAlpha(148) = 255
+			if GetSpriteHitTest(148, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 148
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i 
+					for i = 10 to 109
+						if squarex[i] = position[148, 1] and squarey[i] = position[148, 2]
+							gosub tankwhite
+						endif
+					next i 
+				endif
+			endif
+		endif
+	endif
+		// Starts on Square 109 //
+	if playerturn = 1
+		if GetSpriteColorAlpha(149) = 255
+			if GetSpriteHitTest(149, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 149
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i 
+					for i = 10 to 109
+						if squarex[i] = position[149, 1] and squarey[i] = position[149, 2]
+							gosub tankwhite
+						endif
+					next i 
+				endif
+			endif
+		endif
+	endif
+	// Black //
+		// Starts on Square 10 //
+	if playerturn = 2
+		if GetSpriteColorAlpha(128) = 255
+			if GetSpriteHitTest(128, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 128
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i 
+					for i = 10 to 109
+						if squarex[i] = position[128, 1] and squarey[i] = position[128, 2]
+							gosub tankblack
+						endif
+					next i 
+				endif
+			endif
+		endif
+	endif
+		// Starts on Square 19 //
+	if playerturn = 2
+		if GetSpriteColorAlpha(129) = 255
+			if GetSpriteHitTest(129, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 129
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i 
+					for i = 10 to 109
+						if squarex[i] = position[129, 1] and squarey[i] = position[129, 2]
+							gosub tankblack
+						endif
+					next i 
+				endif
+			endif
+		endif
+	endif
+return
+
+cavalrymovedisplay:
+// Cavalry //
+	// White //
+		// Starts on Square 102 //
+	if playerturn = 1
+		if GetSpriteColorAlpha(142) = 255
+			if GetSpriteHitTest(142, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 142
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[142, 1] and squarey[i] = position[142, 2]
+							gosub cavalrywhite
+						endif
+					next i
+				endif
+			endif 
+		endif
+	endif
+		// Starts on Square 107 //
+	if playerturn = 1
+		if GetSpriteColorAlpha(143) = 255
+			if GetSpriteHitTest(143, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 143
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[143, 1] and squarey[i] = position[143, 2]
+							gosub cavalrywhite
+						endif
+					next i
+				endif
+			endif 
+		endif
+	endif
+	// Black //
+		// Starts on Square 12 //
+	if playerturn = 2
+		if GetSpriteColorAlpha(122) = 255
+			if GetSpriteHitTest(122, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 122
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[122, 1] and squarey[i] = position[122, 2]
+							gosub cavalryblack
+						endif
+					next i
+				endif
+			endif 
+		endif
+	endif
+		// Starts on Square 17 //
+	if playerturn = 2
+		if GetSpriteColorAlpha(123) = 255
+			if GetSpriteHitTest(123, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 123
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[123, 1] and squarey[i] = position[123, 2]
+							gosub cavalryblack
+						endif
+					next i
+				endif
+			endif 
+		endif
+	endif
+return
+
+chancellormovedisplay:
+// Chancellor //
+	// White //
+	if playerturn = 1
+		if GetSpriteColorAlpha(144) = 255
+			if GetSpriteHitTest(144, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 144
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[144, 1] and squarey[i] = position[144, 2]
+							gosub cavalrywhite
+							gosub tankwhite
+						endif
+					next i
+				endif
+			endif
+		endif
+	endif
+	// Black //
+	if playerturn = 2
+		if GetSpriteColorAlpha(124) = 255
+			if GetSpriteHitTest(124, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 124
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[124, 1] and squarey[i] = position[124, 2]
+							gosub cavalryblack
+							gosub tankblack
+						endif
+					next i
+				endif
+			endif
+		endif
+	endif
+return
+
+generalmovedisplay:
+// General //
+	// White //
+	if playerturn = 1
+		if GetSpriteColorAlpha(145) = 255
+			if GetSpriteHitTest(145, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 145
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[145, 1] and squarey[i] = position[145, 2]
+							gosub cavalrywhite
+							gosub diagonalwhite
+						endif
+					next i
+				endif
+			endif
+		endif
+	endif
+	// Black //
+	if playerturn = 2
+		if GetSpriteColorAlpha(125) = 255
+			if GetSpriteHitTest(125, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 125
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[125, 1] and squarey[i] = position[125, 2]
+							gosub cavalryblack
+							gosub diagonalblack
+						endif
+					next i
+				endif
+			endif
+		endif
+	endif
+return
+
+presidentmovedisplay:
+// President //
+	// White //
+	if playerturn = 1
+		if GetSpriteColorAlpha(147) = 255
+			if GetSpriteHitTest(147, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 147
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[147, 1] and squarey[i] = position[147, 2]
+							gosub tankwhite
+							gosub diagonalwhite
+						endif
+					next i
+				endif
+			endif
+		endif
+	endif
+	// Black //
+	if playerturn = 2
+		if GetSpriteColorAlpha(127) = 255
+			if GetSpriteHitTest(127, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 127
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[127, 1] and squarey[i] = position[127, 2]
+							gosub tankblack
+							gosub diagonalblack
+						endif
+					next i
+				endif
+			endif
+		endif
+	endif
+return
+
+artillerymovedisplay:
+// White //
+	// Square 101 //
+	if playerturn = 1
+		if GetSpriteColorAlpha(140) = 255
+			if GetSpriteHitTest(140, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 140
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[140, 1] and squarey[i] = position[140, 2]
+							gosub artillerywhite
+						endif
+					next i
+				endif
+			endif
+		endif
+	endif
+	// Square 108 //
+	if playerturn = 1
+		if GetSpriteColorAlpha(141) = 255
+			if GetSpriteHitTest(141, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 141
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[141, 1] and squarey[i] = position[141, 2]
+							gosub artillerywhite
+						endif
+					next i
+				endif
+			endif
+		endif
+	endif
+// Black //
+	// Square 11 //
+	if playerturn = 2
+		if GetSpriteColorAlpha(120) = 255
+			if GetSpriteHitTest(120, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 120
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[120, 1] and squarey[i] = position[120, 2]
+							gosub artilleryblack
+						endif
+					next i
+				endif
+			endif
+		endif
+	endif
+	// Square 18 //
+	if playerturn = 2
+		if GetSpriteColorAlpha(121) = 255
+			if GetSpriteHitTest(121, GetPointerX(), GetPointerY())
+				if GetPointerPressed() = 1
+					spriteid = 121
+					for i = 10 to 109
+						SetSpriteColorAlpha(i, 0)
+					next i
+					for i = 10 to 109
+						if squarex[i] = position[121, 1] and squarey[i] = position[121, 2]
+							gosub artilleryblack
+						endif
+					next i
+				endif
+			endif
+		endif
+	endif
+return
